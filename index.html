@@ -86,11 +86,11 @@
         .btn-secondary { background-color: #8e8e93; }
         .btn-warning { background-color: var(--warning-color); }
 
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
         .btn-quit { background: none; border: none; color: var(--danger-color); font-size: 0.85em; font-weight: bold; cursor: pointer; padding: 0; }
-        .btn-bookmark {
+        .btn-bookmark, .btn-jump {
             background: #f2f2f7; border: 1px solid #d1d1d6; border-radius: 20px;
-            padding: 4px 12px; font-size: 0.85em; font-weight: bold; cursor: pointer; color: var(--text-sub);
+            padding: 4px 10px; font-size: 0.82em; font-weight: bold; cursor: pointer; color: var(--text-main);
         }
         .btn-bookmark.active { background: #fff9e6; border-color: var(--warning-color); color: var(--warning-color); }
 
@@ -132,7 +132,38 @@
         }
 
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
-        .modal-content { background:white; padding:18px; border-radius:16px; width:82%; max-width:350px; text-align:center; }
+        .modal-content { background:white; padding:18px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
+
+        /* ジャンプ用グリッド */
+        .jump-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            max-height: 52vh;
+            overflow-y: auto;
+            padding: 6px;
+            margin-top: 10px;
+        }
+        .jump-btn {
+            background-color: #f2f2f7;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            padding: 8px 2px;
+            font-size: 0.78em;
+            cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .jump-btn.current {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: bold;
+        }
+        .jump-subtext {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -166,7 +197,8 @@
 
     <div id="quiz-screen" class="screen">
         <div class="top-nav">
-            <button class="btn-quit" onclick="quitQuiz()">✕ 中断して戻る</button>
+            <button class="btn-quit" onclick="quitQuiz()">✕ 中断</button>
+            <button class="btn-jump" onclick="openJumpModal()">🔢 問題移動</button>
             <button id="bm-toggle-btn" class="btn-bookmark" onclick="toggleCurrentBookmark()">★ あとで復習</button>
             <div class="score-badge">獲得点: <span id="current-score">0</span> / 100 点</div>
         </div>
@@ -224,6 +256,16 @@
         <p style="font-size:0.85em; color:var(--text-sub);" id="modal-desc">前回の続きから再開しますか？</p>
         <button class="btn-primary" onclick="confirmResume(true)">前回の続きから再開</button>
         <button class="btn-secondary" onclick="confirmResume(false)">最初から解き直す</button>
+    </div>
+</div>
+
+<!-- 問題ジャンプ用モータル -->
+<div id="jump-modal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; margin-bottom:4px;">問題番号を選択</h3>
+        <p style="font-size:0.8em; color:var(--text-sub); margin:0;">移動したい問題番号をタップしてください</p>
+        <div id="jump-grid" class="jump-grid"></div>
+        <button class="btn-secondary" style="margin-top:12px; padding:10px;" onclick="closeJumpModal()">閉じる</button>
     </div>
 </div>
 
@@ -387,25 +429,19 @@
             const { singles, groups } = processRawQuestionsToPools(combinedRaw);
 
             if (selectedMode === 'all') {
-                // 通常テストモード：90問の通常問題 ＋ 5問のイラスト問題 ＝ 全95ステップ（100点満点）
-                // 1. 通常問題 pool から 90問シャッフル抽出
                 singles.sort(() => Math.random() - 0.5);
                 const pickedSingles = singles.slice(0, 90);
 
-                // 2. イラスト問題 pool から 5問シャッフル抽出
                 groups.sort(() => Math.random() - 0.5);
                 const pickedGroups = groups.slice(0, 5);
 
-                // 順番通りモードの場合は番号順ソート、ランダムモードなら混ざる
                 if (selectedOrder === 'normal') {
                     pickedSingles.sort((a,b) => parseInt(a.num) - parseInt(b.num));
-                    // 最後にイラスト問題を配置
                     groupedQuestions = [...pickedSingles, ...pickedGroups];
                 } else {
                     groupedQuestions = [...pickedSingles, ...pickedGroups].sort(() => Math.random() - 0.5);
                 }
             } else {
-                // 弱点 / ブックマーク モード
                 let pool = [...singles, ...groups];
                 const mistakeMap = JSON.parse(localStorage.getItem('driver_quiz_mistake_map') || '{}');
                 const bookmarkSet = new Set(JSON.parse(localStorage.getItem('driver_quiz_bookmarks') || '[]'));
@@ -486,7 +522,6 @@
                     i++;
                 }
 
-                singles.push ? null : null;
                 const groupKey = `${currentSetId}-${groupId}`;
                 groupsMap[groupKey] = {
                     type: "group",
@@ -722,6 +757,43 @@
         } else {
             finishQuiz();
         }
+    }
+
+    /* --- ジャンプ機能用ロジック --- */
+    function openJumpModal() {
+        const grid = document.getElementById('jump-grid');
+        grid.innerHTML = "";
+
+        groupedQuestions.forEach((step, idx) => {
+            const btn = document.createElement('div');
+            btn.className = "jump-btn" + (idx === currentIndex ? " current" : "");
+
+            let labelText = "";
+            if (step.type === 'single') {
+                labelText = `第${step.setId}集-問${step.num}`;
+            } else {
+                labelText = `第${step.setId}集-問${step.group}`;
+            }
+
+            btn.innerHTML = `
+                <div><strong>#${idx + 1}</strong></div>
+                <div class="jump-subtext">${labelText}</div>
+            `;
+
+            btn.onclick = () => {
+                currentIndex = idx;
+                closeJumpModal();
+                showQuestion();
+            };
+
+            grid.appendChild(btn);
+        });
+
+        document.getElementById('jump-modal').style.display = 'flex';
+    }
+
+    function closeJumpModal() {
+        document.getElementById('jump-modal').style.display = 'none';
     }
 
     function finishQuiz() {
