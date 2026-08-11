@@ -138,7 +138,7 @@
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
         .modal-content { background:white; padding:18px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
 
-        /* ジャンプ用グリッド & 色分けスタイル */
+        /* ジャンプ用グリッド & 重複対応スタイル */
         .jump-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -158,11 +158,7 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             position: relative;
             min-height: 42px;
-        }
-        .jump-btn.current {
-            border: 2px solid var(--primary-color) !important;
-            font-weight: bold;
-            box-shadow: 0 0 6px rgba(0, 122, 255, 0.4);
+            box-sizing: border-box;
         }
         .jump-btn.state-correct {
             background-color: #e8f8ed;
@@ -174,10 +170,14 @@
             border-color: var(--danger-color);
             color: #c5221f;
         }
+        /* ★ブックマーク用の太枠重複スタイル */
         .jump-btn.state-bm {
-            background-color: #fff9e6;
-            border-color: var(--warning-color);
-            color: #b36b00;
+            border: 2px solid var(--warning-color) !important;
+        }
+        .jump-btn.current {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -1px;
+            font-weight: bold;
         }
         .jump-subtext {
             font-size: 0.85em;
@@ -289,7 +289,7 @@
         <div class="jump-legend">
             <span>🟢 正解</span>
             <span>🔴 不正解</span>
-            <span>🟡 ★復習</span>
+            <span>🟡 太枠: ★復習</span>
             <span>⚪ 未解答</span>
         </div>
         <div id="jump-grid" class="jump-grid"></div>
@@ -311,7 +311,7 @@
     let groupUserAnswers = {};
     let sessionMistakeSteps = [];
     
-    // ステータス管理用マップ（index ➔ 'correct' | 'incorrect'）
+    // 解答保存用オブジェクト (index ➔ { isCorrect, explanationHTML, userAnswers })
     let stepResultsMap = {};
 
     const SETS_CONFIG = [
@@ -595,12 +595,12 @@
     function showQuestion() {
         saveActiveProgress();
 
-        document.getElementById('result-box').style.display = 'none';
         document.getElementById('current-score').innerText = normalScore;
         document.getElementById('mistake-count').innerText = totalMistakes;
         document.getElementById('q-idx').innerText = currentIndex + 1;
 
         const currentStep = groupedQuestions[currentIndex];
+        const prevResult = stepResultsMap[currentIndex]; // 解答済みデータが存在するか
 
         updateBookmarkUI();
 
@@ -632,12 +632,20 @@
         if (currentStep.type === "single") {
             document.getElementById('single-q-box').style.display = 'flex';
             document.getElementById('group-q-box').style.display = 'none';
-            document.getElementById('answer-buttons').style.display = 'flex';
             document.getElementById('question-text').innerText = currentStep.q;
+
+            if (prevResult) {
+                // すでに解答済みの場合はボタンを隠して解説を表示
+                document.getElementById('answer-buttons').style.display = 'none';
+                showResultUI(prevResult.isCorrect, prevResult.explanationHTML);
+            } else {
+                document.getElementById('answer-buttons').style.display = 'flex';
+                document.getElementById('result-box').style.display = 'none';
+            }
         } else {
             document.getElementById('single-q-box').style.display = 'none';
             document.getElementById('group-q-box').style.display = 'flex';
-            renderGroupQuestions(currentStep);
+            renderGroupQuestions(currentStep, prevResult);
         }
     }
 
@@ -684,8 +692,8 @@
         updateBookmarkUI();
     }
 
-    function renderGroupQuestions(stepData) {
-        groupUserAnswers = {};
+    function renderGroupQuestions(stepData, prevResult) {
+        groupUserAnswers = (prevResult && prevResult.userAnswers) || {};
         const container = document.getElementById('group-sub-list');
         container.innerHTML = "";
 
@@ -693,20 +701,32 @@
             const subBox = document.createElement('div');
             subBox.className = "group-sub-q";
 
+            const userVal = groupUserAnswers[idx];
+
             subBox.innerHTML = `
                 <div class="group-sub-text">${item.q}</div>
                 <div class="group-toggle-group">
-                    <div class="toggle-opt" id="toggle-${idx}-true" onclick="selectGroupOpt(${idx}, '◯')">◯</div>
-                    <div class="toggle-opt" id="toggle-${idx}-false" onclick="selectGroupOpt(${idx}, '✕')">✕</div>
+                    <div class="toggle-opt ${userVal === '◯' ? 'selected-true' : ''}" id="toggle-${idx}-true" ${!prevResult ? `onclick="selectGroupOpt(${idx}, '◯')"` : ''}>◯</div>
+                    <div class="toggle-opt ${userVal === '✕' ? 'selected-false' : ''}" id="toggle-${idx}-false" ${!prevResult ? `onclick="selectGroupOpt(${idx}, '✕')"` : ''}>✕</div>
                 </div>
             `;
             container.appendChild(subBox);
         });
 
-        updateGroupConfirmBtn();
+        const confirmBtn = document.getElementById('btn-confirm-group');
+        if (prevResult) {
+            confirmBtn.style.display = 'none';
+            showResultUI(prevResult.isCorrect, prevResult.explanationHTML);
+        } else {
+            confirmBtn.style.display = 'block';
+            document.getElementById('result-box').style.display = 'none';
+            updateGroupConfirmBtn();
+        }
     }
 
     function selectGroupOpt(subIdx, val) {
+        if (stepResultsMap[currentIndex]) return; // 解答済みなら何もしない
+
         groupUserAnswers[subIdx] = val;
 
         const trueBtn = document.getElementById(`toggle-${subIdx}-true`);
@@ -739,25 +759,35 @@
     }
 
     function checkSingleAnswer(userAns) {
+        if (stepResultsMap[currentIndex]) return; // 二重解答防止
+
         document.getElementById('answer-buttons').style.display = 'none';
 
         const step = groupedQuestions[currentIndex];
         const isCorrect = (userAns === step.a);
 
+        const explanationHTML = `<strong>正解: ${step.a}</strong><br>${step.ex || '（解説なし）'}`;
+
+        stepResultsMap[currentIndex] = {
+            isCorrect: isCorrect,
+            explanationHTML: explanationHTML,
+            userAnswers: { 0: userAns }
+        };
+
         if (isCorrect) {
             normalScore += 1;
-            stepResultsMap[currentIndex] = 'correct';
         } else {
             totalMistakes += 1;
-            stepResultsMap[currentIndex] = 'incorrect';
             recordMistake(step.uniqueKey);
             sessionMistakeSteps.push(step);
         }
 
-        showResultUI(isCorrect, `<strong>正解: ${step.a}</strong><br>${step.ex || '（解説なし）'}`);
+        showResultUI(isCorrect, explanationHTML);
     }
 
     function checkGroupAnswer() {
+        if (stepResultsMap[currentIndex]) return; // 二重解答防止
+
         document.getElementById('btn-confirm-group').style.display = 'none';
 
         const step = groupedQuestions[currentIndex];
@@ -782,11 +812,15 @@
             `;
         });
 
+        stepResultsMap[currentIndex] = {
+            isCorrect: allCorrect,
+            explanationHTML: explanationHTML,
+            userAnswers: { ...groupUserAnswers }
+        };
+
         if (allCorrect) {
             normalScore += 2;
-            stepResultsMap[currentIndex] = 'correct';
         } else {
-            stepResultsMap[currentIndex] = 'incorrect';
             sessionMistakeSteps.push(step);
         }
 
@@ -811,14 +845,14 @@
     }
 
     function nextQuestion() {
-        document.getElementById('btn-confirm-group').style.display = 'block';
-
+        // 全問解答済みかチェック
         const totalAnsweredCount = Object.keys(stepResultsMap).length;
         if (totalAnsweredCount >= groupedQuestions.length) {
             finishQuiz();
             return;
         }
 
+        // 次の未解答の問題を検索（現在の位置から後ろ ➔ 先頭からの順で探す）
         let nextIdx = -1;
         for (let i = currentIndex + 1; i < groupedQuestions.length; i++) {
             if (!stepResultsMap[i]) {
@@ -843,7 +877,7 @@
         }
     }
 
-    /* --- ジャンプ機能用ロジック（ステータス別色分け表示） --- */
+    /* --- ジャンプ機能用ロジック（色と太枠の重複表示対応） --- */
     function openJumpModal() {
         const grid = document.getElementById('jump-grid');
         grid.innerHTML = "";
@@ -852,7 +886,7 @@
 
         groupedQuestions.forEach((step, idx) => {
             const btn = document.createElement('div');
-            const resultState = stepResultsMap[idx]; // 'correct' | 'incorrect' | undefined
+            const resultData = stepResultsMap[idx];
             const isCurrent = (idx === currentIndex);
 
             let isBm = false;
@@ -865,17 +899,24 @@
             let stateClass = "";
             let iconMark = "";
 
-            if (resultState === 'correct') {
-                stateClass = " state-correct";
-                iconMark = "✓";
-            } else if (resultState === 'incorrect') {
-                stateClass = " state-incorrect";
-                iconMark = "✕";
-            } else if (isBm) {
-                stateClass = " state-bm";
-                iconMark = "★";
+            // 正解・不正解（背景色決定）
+            if (resultData) {
+                if (resultData.isCorrect) {
+                    stateClass += " state-correct";
+                    iconMark = "✓";
+                } else {
+                    stateClass += " state-incorrect";
+                    iconMark = "✕";
+                }
             }
 
+            // ブックマーク（太枠＆★マーク決定・重複可能）
+            if (isBm) {
+                stateClass += " state-bm";
+                iconMark += (iconMark ? " ★" : "★");
+            }
+
+            // 現在選択中
             if (isCurrent) {
                 stateClass += " current";
             }
@@ -890,7 +931,7 @@
             }
 
             btn.innerHTML = `
-                <div><strong>#${idx + 1}</strong> ${iconMark}</div>
+                <div><strong>#${idx + 1}</strong> <span style="font-size:0.9em; font-weight:bold;">${iconMark}</span></div>
                 <div class="jump-subtext">${labelText}</div>
             `;
 
