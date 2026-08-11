@@ -29,116 +29,128 @@
             width: 92%; max-width: 500px;
             border-radius: 20px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            padding: 20px; box-sizing: border-box;
+            padding: 16px 20px 20px 20px; box-sizing: border-box;
             display: flex; flex-direction: column;
-            min-height: 88vh;
+            min-height: 85vh;
         }
 
         .screen { display: none; flex-direction: column; height: 100%; flex-grow: 1; }
         .active { display: flex; }
 
-        h1 { font-size: 1.4em; text-align: center; color: var(--text-main); margin: 5px 0 2px 0; }
-        h2 { font-size: 0.9em; color: var(--text-sub); text-align: center; margin-bottom: 15px; }
+        h1 { font-size: 1.35em; text-align: center; color: var(--text-main); margin: 2px 0 2px 0; }
+        h2 { font-size: 0.85em; color: var(--text-sub); text-align: center; margin-bottom: 12px; }
 
-        .section-label { font-size: 0.9em; font-weight: bold; color: var(--text-main); margin: 12px 0 6px 0; display: flex; justify-content: space-between; align-items: center; }
-        .btn-link { background: none; border: none; color: var(--primary-color); font-size: 0.85em; font-weight: bold; cursor: pointer; padding: 0; }
+        .section-label { font-size: 0.88em; font-weight: bold; color: var(--text-main); margin: 10px 0 6px 0; display: flex; justify-content: space-between; align-items: center; }
+        .btn-link { background: none; border: none; color: var(--primary-color); font-size: 0.82em; font-weight: bold; cursor: pointer; padding: 0; }
 
         /* セット選択カード */
-        .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
         .set-card {
             background-color: #f9f9f9;
             border: 2px solid #e5e5ea;
             border-radius: 12px;
-            padding: 10px;
+            padding: 8px 10px;
             cursor: pointer;
             display: flex; flex-direction: column; justify-content: space-between;
             min-height: 52px;
             transition: all 0.2s;
         }
         .set-card.selected { border-color: var(--primary-color); background-color: #e5f1ff; }
-        .set-title { font-size: 0.95em; font-weight: bold; color: var(--text-main); }
-        .set-status { font-size: 0.75em; font-weight: bold; color: var(--text-sub); margin-top: 4px; }
-        .status-badge-pass { color: var(--success-color); }
+        .set-title { font-size: 0.9em; font-weight: bold; color: var(--text-main); }
+        .set-status { font-size: 0.72em; color: var(--text-sub); margin-top: 3px; font-weight: 500; }
+        .history-dots { color: var(--primary-color); font-weight: bold; }
 
-        .mode-group { display: flex; gap: 6px; margin-bottom: 10px; }
+        /* 複数範囲テストの履歴領域 */
+        .multi-history-box {
+            background: #f2f2f7; border-radius: 10px; padding: 6px 10px; margin-bottom: 8px; font-size: 0.75em; color: var(--text-main);
+        }
+
+        .mode-group { display: flex; gap: 6px; margin-bottom: 8px; }
         .mode-btn {
-            flex: 1; padding: 10px 4px; text-align: center;
+            flex: 1; padding: 8px 4px; text-align: center;
             border: 1px solid #d1d1d6; border-radius: 10px;
             cursor: pointer; font-weight: bold; background-color: #f9f9f9;
-            font-size: 0.82em; color: var(--text-main);
+            font-size: 0.8em; color: var(--text-main);
         }
         .mode-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
-        .radio-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .radio-group { display: flex; gap: 8px; margin-bottom: 12px; }
         .radio-btn {
-            flex: 1; padding: 10px; text-align: center;
+            flex: 1; padding: 8px; text-align: center;
             border: 1px solid #d1d1d6; border-radius: 10px;
             cursor: pointer; font-weight: bold; background-color: #f9f9f9;
-            font-size: 0.85em;
+            font-size: 0.82em;
         }
         .radio-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
         .btn-primary, .btn-secondary, .btn-warning {
             background-color: var(--primary-color); color: white; border: none;
-            padding: 15px; font-size: 1.05em; font-weight: bold;
-            border-radius: 14px; cursor: pointer; width: 100%; margin-top: 6px;
+            padding: 13px; font-size: 1.0em; font-weight: bold;
+            border-radius: 14px; cursor: pointer; width: 100%; margin-top: 4px;
         }
         .btn-secondary { background-color: #8e8e93; }
         .btn-warning { background-color: var(--warning-color); }
 
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
         .btn-quit { background: none; border: none; color: var(--danger-color); font-size: 0.85em; font-weight: bold; cursor: pointer; padding: 0; }
         .btn-bookmark, .btn-jump {
             background: #f2f2f7; border: 1px solid #d1d1d6; border-radius: 20px;
-            padding: 4px 10px; font-size: 0.82em; font-weight: bold; cursor: pointer; color: var(--text-main);
+            padding: 4px 10px; font-size: 0.8em; font-weight: bold; cursor: pointer; color: var(--text-main);
         }
         .btn-bookmark.active { background: #fff9e6; border-color: var(--warning-color); color: var(--warning-color); }
 
-        .score-badge { background-color: #e5f1ff; color: var(--primary-color); padding: 4px 10px; border-radius: 10px; font-weight: bold; font-size: 0.85em; }
+        .score-badge { background-color: #e5f1ff; color: var(--primary-color); padding: 3px 8px; border-radius: 10px; font-weight: bold; font-size: 0.82em; }
 
         .quiz-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #e5e5ea; padding-bottom: 6px; margin-bottom: 12px;
-            font-size: 0.85em; color: var(--text-sub);
+            border-bottom: 1px solid #e5e5ea; padding-bottom: 4px; margin-bottom: 8px;
+            font-size: 0.82em; color: var(--text-sub);
         }
 
-        /* 複数画像表示対応コンテナ */
+        /* 画像コンテナ */
         .img-container {
-            width: 100%; text-align: center; margin-bottom: 12px;
-            display: flex; flex-direction: column; gap: 8px; align-items: center;
+            width: 100%; text-align: center; margin-bottom: 8px;
+            display: flex; flex-direction: column; gap: 6px; align-items: center;
         }
-        .img-container img { max-width: 100%; max-height: 170px; border-radius: 10px; border: 1px solid #e5e5ea; }
+        .img-container img { max-width: 100%; max-height: 150px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
-        #question-text { font-size: 1.1em; line-height: 1.5; color: var(--text-main); margin-bottom: 18px; flex-grow: 1; font-weight: 500; }
-        .btn-ans-group { display: flex; gap: 12px; margin-bottom: 8px; }
-        .btn-ans { flex: 1; padding: 16px 0; font-size: 2.2em; border: none; border-radius: 16px; cursor: pointer; color: white; font-weight: bold; }
+        /* 余白を詰めた問題文エリア */
+        #single-q-box { display: none; flex-direction: column; justify-content: space-between; margin-bottom: 6px; }
+        #question-text { font-size: 1.05em; line-height: 1.45; color: var(--text-main); margin-bottom: 10px; font-weight: 500; }
+        
+        .btn-ans-group { display: flex; gap: 10px; margin-bottom: 4px; }
+        .btn-ans { flex: 1; padding: 12px 0; font-size: 2.0em; border: none; border-radius: 14px; cursor: pointer; color: white; font-weight: bold; }
         #btn-true { background-color: var(--success-color); }
         #btn-false { background-color: var(--danger-color); }
 
-        .group-sub-q { background: #f9f9f9; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #e5e5ea; }
-        .group-sub-text { font-size: 0.9em; line-height: 1.4; font-weight: bold; margin-bottom: 6px; color: var(--text-main); }
+        .group-sub-q { background: #f9f9f9; padding: 8px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e5e5ea; }
+        .group-sub-text { font-size: 0.88em; line-height: 1.35; font-weight: bold; margin-bottom: 4px; color: var(--text-main); }
         .group-toggle-group { display: flex; gap: 8px; }
         .toggle-opt {
-            flex: 1; padding: 8px 0; text-align: center; border: 1px solid #d1d1d6; border-radius: 8px;
-            font-weight: bold; font-size: 1.1em; cursor: pointer; background: white; color: var(--text-sub);
+            flex: 1; padding: 6px 0; text-align: center; border: 1px solid #d1d1d6; border-radius: 8px;
+            font-weight: bold; font-size: 1.0em; cursor: pointer; background: white; color: var(--text-sub);
         }
         .toggle-opt.selected-true { background-color: var(--success-color); color: white; border-color: var(--success-color); }
         .toggle-opt.selected-false { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
 
-        #result-box { display: none; text-align: center; border-top: 1px solid #e5e5ea; padding-top: 12px; margin-top: 8px; }
-        #judgment { font-size: 1.7em; font-weight: bold; margin-bottom: 6px; }
+        #result-box { display: none; text-align: center; border-top: 1px solid #e5e5ea; padding-top: 8px; margin-top: 4px; }
+        #judgment { font-size: 1.5em; font-weight: bold; margin-bottom: 4px; }
         .correct-judg { color: var(--success-color); }
         .incorrect-judg { color: var(--danger-color); }
         .explanation-box {
-            font-size: 0.88em; line-height: 1.4; color: var(--text-main);
-            background-color: #f2f2f7; padding: 10px; border-radius: 10px;
-            margin: 8px 0 12px 0; text-align: left;
+            font-size: 0.85em; line-height: 1.35; color: var(--text-main);
+            background-color: #f2f2f7; padding: 8px 10px; border-radius: 10px;
+            margin: 6px 0 10px 0; text-align: left;
         }
 
-        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
-        .modal-content { background:white; padding:18px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
+        /* 画面移動用ボタンエリア */
+        .nav-btn-group { display: flex; gap: 8px; margin-top: 4px; }
+        .nav-btn-group button { flex: 1; margin-top: 0; padding: 12px; font-size: 0.95em; }
 
-        /* ジャンプ用グリッド & 重複対応スタイル */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
+        .modal-content { background:white; padding:16px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
+
+        /* ジャンプ用グリッド */
         .jump-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -146,7 +158,7 @@
             max-height: 48vh;
             overflow-y: auto;
             padding: 6px;
-            margin-top: 10px;
+            margin-top: 8px;
         }
         .jump-btn {
             background-color: #f2f2f7;
@@ -160,33 +172,14 @@
             min-height: 42px;
             box-sizing: border-box;
         }
-        .jump-btn.state-correct {
-            background-color: #e8f8ed;
-            border-color: var(--success-color);
-            color: #1e7e34;
-        }
-        .jump-btn.state-incorrect {
-            background-color: #ffebe9;
-            border-color: var(--danger-color);
-            color: #c5221f;
-        }
-        /* ★ブックマーク用の太枠重複スタイル */
-        .jump-btn.state-bm {
-            border: 2px solid var(--warning-color) !important;
-        }
-        .jump-btn.current {
-            outline: 2px solid var(--primary-color);
-            outline-offset: -1px;
-            font-weight: bold;
-        }
-        .jump-subtext {
-            font-size: 0.85em;
-            opacity: 0.85;
-            margin-top: 1px;
-        }
+        .jump-btn.state-correct { background-color: #e8f8ed; border-color: var(--success-color); color: #1e7e34; }
+        .jump-btn.state-incorrect { background-color: #ffebe9; border-color: var(--danger-color); color: #c5221f; }
+        .jump-btn.state-bm { border: 2px solid var(--warning-color) !important; }
+        .jump-btn.current { outline: 2px solid var(--primary-color); outline-offset: -1px; font-weight: bold; }
+        .jump-subtext { font-size: 0.82em; opacity: 0.85; margin-top: 1px; }
         .jump-legend {
-            display: flex; justify-content: space-around; font-size: 0.72em; color: var(--text-sub);
-            margin-top: 6px; padding: 4px; background: #f9f9f9; border-radius: 8px;
+            display: flex; justify-content: space-around; font-size: 0.7em; color: var(--text-sub);
+            margin-top: 4px; padding: 4px; background: #f9f9f9; border-radius: 8px;
         }
     </style>
 </head>
@@ -203,10 +196,12 @@
         </div>
         <div class="set-grid" id="set-card-grid"></div>
 
+        <div id="multi-history-area" class="multi-history-box" style="display:none;"></div>
+
         <div class="section-label">2. 出題モード</div>
         <div class="mode-group">
             <div class="mode-btn selected" id="mode-all" onclick="selectMode('all')">模擬試験（95問/100点）</div>
-            <div class="mode-btn" id="mode-weak" onclick="selectMode('weak')">弱点 (ミス2回+)</div>
+            <div class="mode-btn" id="mode-weak" onclick="selectMode('weak')">弱点 (正答80%未満)</div>
             <div class="mode-btn" id="mode-bm" onclick="selectMode('bm')">★ ブックマーク</div>
         </div>
 
@@ -223,7 +218,7 @@
         <div class="top-nav">
             <button class="btn-quit" onclick="quitQuiz()">✕ 中断</button>
             <button class="btn-jump" onclick="openJumpModal()">🔢 問題移動</button>
-            <button id="bm-toggle-btn" class="btn-bookmark" onclick="toggleCurrentBookmark()">★ あとで復習</button>
+            <button id="bm-toggle-btn" class="btn-bookmark" onclick="toggleCurrentBookmark()">★ ブックマーク</button>
             <div class="score-badge">獲得点: <span id="current-score">0</span> / 100 点</div>
         </div>
 
@@ -232,10 +227,10 @@
             <div>ミス: <span id="mistake-count" style="color:var(--danger-color); font-weight:bold;">0</span> 問</div>
         </div>
 
-        <!-- 複数画像対応の画像コンテナ -->
+        <!-- 複数画像表示対応コンテナ -->
         <div id="img-box" class="img-container" style="display:none;"></div>
 
-        <div id="single-q-box" style="display:none; flex-direction:column; flex-grow:1;">
+        <div id="single-q-box">
             <div id="question-text">読み込み中...</div>
             <div id="answer-buttons" class="btn-ans-group">
                 <button id="btn-true" class="btn-ans" onclick="checkSingleAnswer('◯')">◯</button>
@@ -244,7 +239,7 @@
         </div>
 
         <div id="group-q-box" style="display:none; flex-direction:column; flex-grow:1;">
-            <div style="font-weight:bold; font-size:0.9em; color:var(--primary-color); margin-bottom:8px;">
+            <div style="font-weight:bold; font-size:0.88em; color:var(--primary-color); margin-bottom:6px;">
                 【イラスト問題】3つの記述すべての◯✕を選択してください（全正解で2点）
             </div>
             <div id="group-sub-list"></div>
@@ -254,7 +249,10 @@
         <div id="result-box">
             <div id="judgment"></div>
             <div id="explanation-container" class="explanation-box"></div>
-            <button id="next-btn" class="btn-primary" onclick="nextQuestion()">次の問題へ</button>
+            <div class="nav-btn-group">
+                <button id="prev-btn" class="btn-secondary" onclick="prevQuestion()">◀ 前の問へ</button>
+                <button id="next-btn" class="btn-primary" onclick="nextQuestion()">次の問題へ ▶</button>
+            </div>
         </div>
     </div>
 
@@ -328,34 +326,59 @@
         renderSetCards();
     };
 
+    /* 直近5回の履歴を取得・描画する関数 */
     function renderSetCards() {
         const gridElem = document.getElementById('set-card-grid');
         gridElem.innerHTML = "";
 
-        const allProgress = JSON.parse(localStorage.getItem('driver_quiz_progress_map') || '{}');
+        const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
 
         SETS_CONFIG.forEach(set => {
             const card = document.createElement('div');
             const isSelected = selectedSetIds.includes(set.id);
             card.className = "set-card" + (isSelected ? " selected" : "");
 
-            const prog = allProgress[set.id];
-            let statusText = "未挑戦";
-            let statusClass = "";
+            const history = historyMap[set.id] || []; // 配列 [80, 85, 92]
+            let historyText = "未挑戦";
 
-            if (prog && prog.maxScore !== undefined) {
-                statusText = `最高: ${prog.maxScore}点 ${prog.maxScore >= 90 ? '合格' : ''}`;
-                statusClass = prog.maxScore >= 90 ? "status-badge-pass" : "";
+            if (history.length > 0) {
+                const last5 = history.slice(-5);
+                historyText = `直近: <span class="history-dots">${last5.join(' ➔ ')}点</span>`;
             }
 
             card.innerHTML = `
                 <div class="set-title">${set.name}</div>
-                <div class="set-status ${statusClass}">${statusText}</div>
+                <div class="set-status">${historyText}</div>
             `;
 
             card.onclick = () => toggleSetSelection(set.id);
             gridElem.appendChild(card);
         });
+
+        // 複数選択時の履歴表示
+        renderMultiHistory();
+    }
+
+    function renderMultiHistory() {
+        const multiBox = document.getElementById('multi-history-area');
+        if (selectedSetIds.length <= 1) {
+            multiBox.style.display = 'none';
+            return;
+        }
+
+        const multiHistory = JSON.parse(localStorage.getItem('driver_quiz_multi_history') || '[]');
+        if (multiHistory.length === 0) {
+            multiBox.style.display = 'none';
+            return;
+        }
+
+        const last3 = multiHistory.slice(-3).reverse();
+        let html = `<strong>【複数選択テストの直近履歴】</strong><br>`;
+        last3.forEach(item => {
+            html += `・[第${item.sets.join(',')}集] ${item.score}点 (${item.date})<br>`;
+        });
+        multiBox.innerHTML = html;
+        multiBox.style.display = 'block';
     }
 
     function toggleSetSelection(setId) {
@@ -478,16 +501,23 @@
                 }
             } else {
                 let pool = [...singles, ...groups];
-                const mistakeMap = JSON.parse(localStorage.getItem('driver_quiz_mistake_map') || '{}');
+                const statsMap = JSON.parse(localStorage.getItem('driver_quiz_stats_map') || '{}');
                 const bookmarkSet = new Set(JSON.parse(localStorage.getItem('driver_quiz_bookmarks') || '[]'));
 
                 if (selectedMode === 'weak') {
+                    // 正答率 80% 未満 (挑戦回数3回以上かつ 正解/挑戦 < 0.8) の問題を抽出
                     pool = pool.filter(step => {
-                        if (step.type === 'single') return (mistakeMap[step.uniqueKey] || 0) >= 2;
-                        return step.items.some(item => (mistakeMap[item._uniqueKey] || 0) >= 2);
+                        const checkWeak = (key) => {
+                            const stat = statsMap[key];
+                            if (!stat || stat.total < 3) return false;
+                            return (stat.correct / stat.total) < 0.8;
+                        };
+
+                        if (step.type === 'single') return checkWeak(step.uniqueKey);
+                        return step.items.some(item => checkWeak(item._uniqueKey));
                     });
                     if (pool.length === 0) {
-                        alert("選択した範囲内にミス2回以上の「弱点問題」はありませんでした！");
+                        alert("選択した範囲内に挑戦3回以上かつ「正答率80%未満」の弱点問題はありませんでした！");
                         backToTop();
                         return;
                     }
@@ -600,7 +630,7 @@
         document.getElementById('q-idx').innerText = currentIndex + 1;
 
         const currentStep = groupedQuestions[currentIndex];
-        const prevResult = stepResultsMap[currentIndex]; // 解答済みデータが存在するか
+        const prevResult = stepResultsMap[currentIndex];
 
         updateBookmarkUI();
 
@@ -635,7 +665,6 @@
             document.getElementById('question-text').innerText = currentStep.q;
 
             if (prevResult) {
-                // すでに解答済みの場合はボタンを隠して解説を表示
                 document.getElementById('answer-buttons').style.display = 'none';
                 showResultUI(prevResult.isCorrect, prevResult.explanationHTML);
             } else {
@@ -646,6 +675,13 @@
             document.getElementById('single-q-box').style.display = 'none';
             document.getElementById('group-q-box').style.display = 'flex';
             renderGroupQuestions(currentStep, prevResult);
+        }
+
+        // 前に戻るボタンの活性化チェック
+        const prevBtn = document.getElementById('prev-btn');
+        if (prevBtn) {
+            prevBtn.disabled = (currentIndex === 0);
+            prevBtn.style.opacity = (currentIndex === 0) ? "0.4" : "1";
         }
     }
 
@@ -663,10 +699,10 @@
 
         if (isBm) {
             bmBtn.className = "btn-bookmark active";
-            bmBtn.innerText = "★ 復習追加済み";
+            bmBtn.innerText = "★ ブックマーク";
         } else {
             bmBtn.className = "btn-bookmark";
-            bmBtn.innerText = "☆ あとで復習";
+            bmBtn.innerText = "☆ ブックマーク追加";
         }
     }
 
@@ -725,7 +761,7 @@
     }
 
     function selectGroupOpt(subIdx, val) {
-        if (stepResultsMap[currentIndex]) return; // 解答済みなら何もしない
+        if (stepResultsMap[currentIndex]) return;
 
         groupUserAnswers[subIdx] = val;
 
@@ -752,19 +788,26 @@
         }
     }
 
-    function recordMistake(uniqueKey) {
-        const mistakeMap = JSON.parse(localStorage.getItem('driver_quiz_mistake_map') || '{}');
-        mistakeMap[uniqueKey] = (mistakeMap[uniqueKey] || 0) + 1;
-        localStorage.setItem('driver_quiz_mistake_map', JSON.stringify(mistakeMap));
+    /* 正答率算出用の統計更新 */
+    function recordQuestionStat(uniqueKey, isCorrect) {
+        const statsMap = JSON.parse(localStorage.getItem('driver_quiz_stats_map') || '{}');
+        if (!statsMap[uniqueKey]) {
+            statsMap[uniqueKey] = { total: 0, correct: 0 };
+        }
+        statsMap[uniqueKey].total += 1;
+        if (isCorrect) statsMap[uniqueKey].correct += 1;
+        localStorage.setItem('driver_quiz_stats_map', JSON.stringify(statsMap));
     }
 
     function checkSingleAnswer(userAns) {
-        if (stepResultsMap[currentIndex]) return; // 二重解答防止
+        if (stepResultsMap[currentIndex]) return;
 
         document.getElementById('answer-buttons').style.display = 'none';
 
         const step = groupedQuestions[currentIndex];
         const isCorrect = (userAns === step.a);
+
+        recordQuestionStat(step.uniqueKey, isCorrect);
 
         const explanationHTML = `<strong>正解: ${step.a}</strong><br>${step.ex || '（解説なし）'}`;
 
@@ -778,7 +821,6 @@
             normalScore += 1;
         } else {
             totalMistakes += 1;
-            recordMistake(step.uniqueKey);
             sessionMistakeSteps.push(step);
         }
 
@@ -786,7 +828,7 @@
     }
 
     function checkGroupAnswer() {
-        if (stepResultsMap[currentIndex]) return; // 二重解答防止
+        if (stepResultsMap[currentIndex]) return;
 
         document.getElementById('btn-confirm-group').style.display = 'none';
 
@@ -798,10 +840,11 @@
             const userAns = groupUserAnswers[idx];
             const isSubCorrect = (userAns === item.a);
 
+            recordQuestionStat(item._uniqueKey, isSubCorrect);
+
             if (!isSubCorrect) {
                 allCorrect = false;
                 totalMistakes += 1;
-                recordMistake(item._uniqueKey);
             }
 
             explanationHTML += `
@@ -844,15 +887,22 @@
         document.getElementById('mistake-count').innerText = totalMistakes;
     }
 
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            showQuestion();
+        }
+    }
+
     function nextQuestion() {
-        // 全問解答済みかチェック
+        document.getElementById('btn-confirm-group').style.display = 'block';
+
         const totalAnsweredCount = Object.keys(stepResultsMap).length;
         if (totalAnsweredCount >= groupedQuestions.length) {
             finishQuiz();
             return;
         }
 
-        // 次の未解答の問題を検索（現在の位置から後ろ ➔ 先頭からの順で探す）
         let nextIdx = -1;
         for (let i = currentIndex + 1; i < groupedQuestions.length; i++) {
             if (!stepResultsMap[i]) {
@@ -877,7 +927,7 @@
         }
     }
 
-    /* --- ジャンプ機能用ロジック（色と太枠の重複表示対応） --- */
+    /* --- ジャンプ機能用ロジック（太枠と色の重複表示対応） --- */
     function openJumpModal() {
         const grid = document.getElementById('jump-grid');
         grid.innerHTML = "";
@@ -899,7 +949,6 @@
             let stateClass = "";
             let iconMark = "";
 
-            // 正解・不正解（背景色決定）
             if (resultData) {
                 if (resultData.isCorrect) {
                     stateClass += " state-correct";
@@ -910,13 +959,10 @@
                 }
             }
 
-            // ブックマーク（太枠＆★マーク決定・重複可能）
             if (isBm) {
                 stateClass += " state-bm";
-                iconMark += (iconMark ? " ★" : "★");
             }
 
-            // 現在選択中
             if (isCurrent) {
                 stateClass += " current";
             }
@@ -931,7 +977,7 @@
             }
 
             btn.innerHTML = `
-                <div><strong>#${idx + 1}</strong> <span style="font-size:0.9em; font-weight:bold;">${iconMark}</span></div>
+                <div><strong>#${idx + 1}</strong> <span style="font-size:0.85em; font-weight:bold;">${iconMark}</span></div>
                 <div class="jump-subtext">${labelText}</div>
             `;
 
@@ -954,14 +1000,27 @@
     function finishQuiz() {
         localStorage.removeItem('driver_quiz_active_save');
 
-        if (selectedSetIds.length === 1 && selectedMode === 'all') {
-            const setId = selectedSetIds[0];
-            const allProgress = JSON.parse(localStorage.getItem('driver_quiz_progress_map') || '{}');
-            const prevMax = (allProgress[setId] && allProgress[setId].maxScore) || 0;
-
-            if (normalScore > prevMax) {
-                allProgress[setId] = { maxScore: normalScore };
-                localStorage.setItem('driver_quiz_progress_map', JSON.stringify(allProgress));
+        // 完答時の履歴保存ロジック（直近5回）
+        if (selectedMode === 'all') {
+            if (selectedSetIds.length === 1) {
+                // 単一集の場合 ➔ その集の履歴配列に追加
+                const setId = selectedSetIds[0];
+                const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
+                if (!historyMap[setId]) historyMap[setId] = [];
+                historyMap[setId].push(normalScore);
+                if (historyMap[setId].length > 10) historyMap[setId].shift(); // 最大10保存
+                localStorage.setItem('driver_quiz_history_map', JSON.stringify(historyMap));
+            } else {
+                // 複数集選択の場合 ➔ 複数用履歴に追加
+                const multiHistory = JSON.parse(localStorage.getItem('driver_quiz_multi_history') || '[]');
+                const dateStr = new Date().toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' });
+                multiHistory.push({
+                    sets: selectedSetIds,
+                    score: normalScore,
+                    date: dateStr
+                });
+                if (multiHistory.length > 10) multiHistory.shift();
+                localStorage.setItem('driver_quiz_multi_history', JSON.stringify(multiHistory));
             }
         }
 
