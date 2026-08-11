@@ -37,7 +37,7 @@
         .active { display: flex; }
 
         h1 { font-size: 1.4em; text-align: center; color: var(--text-main); margin-top: 10px; }
-        h2 { font-size: 1.1em; color: var(--text-sub); text-align: center; margin-bottom: 20px; }
+        h2 { font-size: 1.0em; color: var(--text-sub); text-align: center; margin-bottom: 20px; }
 
         label { font-weight: bold; margin-top: 15px; display: block; color: var(--text-main); }
         select {
@@ -56,16 +56,20 @@
             background-color: var(--primary-color); color: white; border-color: var(--primary-color);
         }
 
-        .btn-start, #next-btn {
+        .btn-start, #next-btn, .btn-secondary {
             background-color: var(--primary-color); color: white; border: none;
-            padding: 16px; font-size: 1.2em; font-weight: bold;
-            border-radius: 14px; cursor: pointer; margin-top: auto; width: 100%;
+            padding: 16px; font-size: 1.1em; font-weight: bold;
+            border-radius: 14px; cursor: pointer; margin-top: 10px; width: 100%;
+        }
+
+        .btn-secondary {
+            background-color: #8e8e93;
         }
 
         .quiz-header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid #e5e5ea; padding-bottom: 10px; margin-bottom: 15px;
-            font-size: 0.95em; color: var(--text-sub);
+            font-size: 0.9em; color: var(--text-sub);
         }
         .score-badge {
             background-color: #e5f1ff; color: var(--primary-color);
@@ -89,13 +93,20 @@
         #btn-false { background-color: var(--danger-color); }
 
         #result-box { display: none; text-align: center; border-top: 1px solid #e5e5ea; padding-top: 15px; }
-        #judgment { font-size: 1.8em; font-weight: bold; margin-bottom: 8px; }
+        #judgment { font-size: 2.0em; font-weight: bold; margin-bottom: 8px; }
         .correct-judg { color: var(--success-color); }
         .incorrect-judg { color: var(--danger-color); }
         #explanation {
             font-size: 0.95em; line-height: 1.5; color: var(--text-main);
             background-color: #f2f2f7; padding: 14px; border-radius: 12px;
             margin: 10px 0 15px 0; text-align: left;
+        }
+
+        .top-nav {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;
+        }
+        .btn-quit {
+            background: none; border: none; color: #ff3b30; font-size: 0.9em; font-weight: bold; cursor: pointer; padding: 0;
         }
     </style>
 </head>
@@ -106,6 +117,11 @@
     <div id="setup-screen" class="screen active">
         <h1>本免学科試験クイズ</h1>
         <h2>条件を選んでスタート</h2>
+
+        <div id="resume-box" style="display:none; background:#e5f1ff; padding:15px; border-radius:12px; margin-bottom:15px; text-align:center;">
+            <p style="margin:0 0 10px 0; font-weight:bold; color:#007aff;">前回の続きがあります</p>
+            <button class="btn-start" style="margin:0;" onclick="resumeQuiz()">中断したところから再開</button>
+        </div>
 
         <label>1. 問題セットを選択</label>
         <select id="set-select">
@@ -124,14 +140,19 @@
             <div class="radio-btn" onclick="selectOrder('random', this)">ランダム</div>
         </div>
 
-        <button class="btn-start" onclick="startQuiz()">学習を開始する</button>
+        <button class="btn-start" onclick="startNewQuiz()">新しく学習を開始する</button>
     </div>
 
     <!-- 2. クイズプレイ画面 -->
     <div id="quiz-screen" class="screen">
+        <div class="top-nav">
+            <button class="btn-quit" onclick="quitQuiz()">✕ 中断して戻る</button>
+            <div class="score-badge">獲得点: <span id="current-score">0</span> / 100 点</div>
+        </div>
+
         <div class="quiz-header">
-            <div>問 <span id="q-idx">1</span> / <span id="q-total">105</span></div>
-            <div class="score-badge">現在: <span id="current-score">0</span> 点</div>
+            <div>進捗: <span id="q-idx">1</span> / <span id="q-total">105</span> 問目</div>
+            <div>ミス: <span id="mistake-count" style="color:var(--danger-color); font-weight:bold;">0</span> 問</div>
         </div>
 
         <div id="img-box" class="img-container">
@@ -147,7 +168,7 @@
 
         <div id="result-box">
             <div id="judgment"></div>
-            <div>正解: <span id="correct-ans" style="font-weight:bold;"></span></div>
+            <div style="font-size:1.1em; margin-bottom:5px;">解答: <span id="correct-ans" style="font-weight:bold;"></span></div>
             <div id="explanation"></div>
             <button id="next-btn" onclick="nextQuestion()">次の問題へ</button>
         </div>
@@ -156,21 +177,37 @@
     <!-- 3. 結果画面 -->
     <div id="result-screen" class="screen" style="text-align: center; justify-content: center;">
         <h1 id="final-status">結果発表</h1>
-        <div style="font-size: 3em; font-weight: bold; margin: 20px 0;" id="final-score">0点</div>
-        <p id="pass-fail-text" style="font-size: 1.2em; font-weight: bold;"></p>
+        <div style="font-size: 3em; font-weight: bold; margin: 15px 0 5px 0;" id="final-score">0 点</div>
+        <p style="color:var(--text-sub); margin-bottom:20px;">（100点満点中）</p>
+
+        <div style="background:#f2f2f7; padding:15px; border-radius:12px; margin-bottom:20px; text-align:left; line-height:1.8;">
+            <div>・間違えた問題数: <strong id="final-mistakes" style="color:var(--danger-color);">0</strong> 問</div>
+            <div>・結果: <strong id="pass-fail-text"></strong></div>
+        </div>
+
         <button class="btn-start" onclick="location.reload()">トップに戻る</button>
     </div>
 </div>
 
 <script>
-    // ★ ここにデプロイで取得したURLを貼り付けます ★
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxaax0xEuJx68UF4tVIL21mwuXSx-S9h5qXiHxNwKAwxxTsm5w30ZwAe3qf44VqRHCR/exec";
+    // ★ あなたのGoogle Apps ScriptのWebアプリURL ★
+    const GAS_API_URL = "ここにウェブアプリURLを貼り付け";
 
     let selectedOrder = 'normal';
     let currentQuestions = [];
     let currentIndex = 0;
     let normalScore = 0;
+    let totalMistakes = 0;
     let groupResults = {};
+    let currentSetId = "1";
+
+    // 画面初期化時に保存データチェック
+    window.onload = function() {
+        const savedData = localStorage.getItem('driver_quiz_saved');
+        if (savedData) {
+            document.getElementById('resume-box').style.display = 'block';
+        }
+    };
 
     function selectOrder(mode, elem) {
         selectedOrder = mode;
@@ -178,11 +215,34 @@
         elem.classList.add('selected');
     }
 
-    async function startQuiz() {
-        const setId = document.getElementById('set-select').value;
-        const targetSheetName = "set" + setId;
+    function startNewQuiz() {
+        localStorage.removeItem('driver_quiz_saved');
+        currentSetId = document.getElementById('set-select').value;
+        loadAndStartQuiz(false);
+    }
 
-        document.getElementById('question-text').innerText = "スプレッドシートからデータを読み込んでいます...";
+    function resumeQuiz() {
+        const savedData = JSON.parse(localStorage.getItem('driver_quiz_saved'));
+        if (savedData) {
+            currentSetId = savedData.setId;
+            selectedOrder = savedData.order;
+            currentIndex = savedData.currentIndex;
+            normalScore = savedData.normalScore;
+            totalMistakes = savedData.totalMistakes;
+            groupResults = savedData.groupResults;
+            currentQuestions = savedData.currentQuestions;
+
+            document.getElementById('setup-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            document.getElementById('q-total').innerText = currentQuestions.length;
+            showQuestion();
+        }
+    }
+
+    async function loadAndStartQuiz(isResume) {
+        const targetSheetName = "set" + currentSetId;
+
+        document.getElementById('question-text').innerText = "データを読み込んでいます...";
         document.getElementById('setup-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
 
@@ -191,7 +251,7 @@
             const rawData = await response.json();
 
             if (!rawData || rawData.length === 0 || rawData.error) {
-                alert("データの取得に失敗しました。スプレッドシートのシート名（set1〜set3）を確認してください。");
+                alert("データの取得に失敗しました。");
                 location.reload();
                 return;
             }
@@ -204,14 +264,35 @@
 
             currentIndex = 0;
             normalScore = 0;
+            totalMistakes = 0;
             groupResults = {};
 
             document.getElementById('q-total').innerText = currentQuestions.length;
             showQuestion();
 
         } catch (error) {
-            alert("通信エラーが発生しました。URLが正しいか確認してください。");
+            alert("通信エラーが発生しました。");
             console.error(error);
+        }
+    }
+
+    function saveProgress() {
+        const saveData = {
+            setId: currentSetId,
+            order: selectedOrder,
+            currentIndex: currentIndex,
+            normalScore: normalScore,
+            totalMistakes: totalMistakes,
+            groupResults: groupResults,
+            currentQuestions: currentQuestions
+        };
+        localStorage.setItem('driver_quiz_saved', JSON.stringify(saveData));
+    }
+
+    function quitQuiz() {
+        if (confirm("進捗を保存してトップ画面に戻りますか？")) {
+            saveProgress();
+            location.reload();
         }
     }
 
@@ -227,6 +308,8 @@
     }
 
     function showQuestion() {
+        saveProgress(); // 1問ごとに進捗保存
+
         document.getElementById('result-box').style.display = 'none';
         document.getElementById('answer-buttons').style.display = 'flex';
 
@@ -234,6 +317,7 @@
         document.getElementById('q-idx').innerText = currentIndex + 1;
         document.getElementById('question-text').innerText = q.q;
         document.getElementById('current-score').innerText = calculateTotalScore();
+        document.getElementById('mistake-count').innerText = totalMistakes;
 
         const imgBox = document.getElementById('img-box');
         const qImg = document.getElementById('q-img');
@@ -253,6 +337,10 @@
         const q = currentQuestions[currentIndex];
         const isCorrect = (userAns === q.a);
 
+        if (!isCorrect) {
+            totalMistakes += 1;
+        }
+
         if (q.group && q.group !== "") {
             if (!groupResults[q.group]) groupResults[q.group] = [];
             groupResults[q.group].push(isCorrect);
@@ -260,18 +348,20 @@
             if (isCorrect) normalScore += 1;
         }
 
+        // ◯✕記号を廃止し、文字のみの直感的な表示へ
         const judgElem = document.getElementById('judgment');
         if (isCorrect) {
-            judgElem.innerText = "◯ 正解！";
+            judgElem.innerText = "正 解 ！";
             judgElem.className = "correct-judg";
         } else {
-            judgElem.innerText = "✕ 不正解...";
+            judgElem.innerText = "不 正 解 …";
             judgElem.className = "incorrect-judg";
         }
 
         document.getElementById('correct-ans').innerText = q.a;
         document.getElementById('explanation').innerText = q.ex || "（解説なし）";
         document.getElementById('current-score').innerText = calculateTotalScore();
+        document.getElementById('mistake-count').innerText = totalMistakes;
     }
 
     function nextQuestion() {
@@ -279,11 +369,15 @@
         if (currentIndex < currentQuestions.length) {
             showQuestion();
         } else {
+            // 全問終了したら保存データを削除
+            localStorage.removeItem('driver_quiz_saved');
+
             document.getElementById('quiz-screen').classList.remove('active');
             document.getElementById('result-screen').classList.add('active');
 
             const finalScore = calculateTotalScore();
             document.getElementById('final-score').innerText = finalScore + " 点";
+            document.getElementById('final-mistakes').innerText = totalMistakes;
 
             const passElem = document.getElementById('pass-fail-text');
             if (finalScore >= 90) {
