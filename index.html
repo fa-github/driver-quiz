@@ -259,7 +259,7 @@
     </div>
 </div>
 
-<!-- 問題ジャンプ用モータル -->
+<!-- 問題ジャンプ用モーダル -->
 <div id="jump-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0; margin-bottom:4px;">問題番号を選択</h3>
@@ -429,16 +429,19 @@
             const { singles, groups } = processRawQuestionsToPools(combinedRaw);
 
             if (selectedMode === 'all') {
-                singles.sort(() => Math.random() - 0.5);
-                const pickedSingles = singles.slice(0, 90);
-
-                groups.sort(() => Math.random() - 0.5);
-                const pickedGroups = groups.slice(0, 5);
-
                 if (selectedOrder === 'normal') {
-                    pickedSingles.sort((a,b) => parseInt(a.num) - parseInt(b.num));
+                    singles.sort((a,b) => parseInt(a.num) - parseInt(b.num));
+                    groups.sort((a,b) => parseInt(a.group) - parseInt(b.group));
+
+                    const pickedSingles = singles.slice(0, 90);
+                    const pickedGroups = groups.slice(0, 5);
                     groupedQuestions = [...pickedSingles, ...pickedGroups];
                 } else {
+                    singles.sort(() => Math.random() - 0.5);
+                    groups.sort(() => Math.random() - 0.5);
+
+                    const pickedSingles = singles.slice(0, 90);
+                    const pickedGroups = groups.slice(0, 5);
                     groupedQuestions = [...pickedSingles, ...pickedGroups].sort(() => Math.random() - 0.5);
                 }
             } else {
@@ -470,6 +473,12 @@
 
                 if (selectedOrder === 'random') {
                     pool.sort(() => Math.random() - 0.5);
+                } else {
+                    pool.sort((a, b) => {
+                        const numA = a.type === 'single' ? parseInt(a.num) : (parseInt(a.group) + 100);
+                        const numB = b.type === 'single' ? parseInt(b.num) : (parseInt(b.group) + 100);
+                        return numA - numB;
+                    });
                 }
                 groupedQuestions = pool;
             }
