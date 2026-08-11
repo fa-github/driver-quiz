@@ -39,7 +39,6 @@
         h1 { font-size: 1.4em; text-align: center; color: var(--text-main); margin: 10px 0 5px 0; }
         h2 { font-size: 0.95em; color: var(--text-sub); text-align: center; margin-bottom: 20px; }
 
-        /* セット選択カード */
         .set-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
         .set-card {
             background-color: #f9f9f9;
@@ -85,18 +84,16 @@
             font-size: 0.9em; color: var(--text-sub);
         }
 
-        /* 画像表示 */
+        /* 画像表示エリア（ブロック回避設定済み） */
         .img-container { width: 100%; text-align: center; margin-bottom: 15px; }
         .img-container img { max-width: 100%; max-height: 180px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
-        /* 通常問題 */
         #question-text { font-size: 1.15em; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; flex-grow: 1; font-weight: 500; }
         .btn-ans-group { display: flex; gap: 15px; margin-bottom: 10px; }
         .btn-ans { flex: 1; padding: 18px 0; font-size: 2.5em; border: none; border-radius: 16px; cursor: pointer; color: white; font-weight: bold; }
         #btn-true { background-color: var(--success-color); }
         #btn-false { background-color: var(--danger-color); }
 
-        /* イラスト問題（一括） */
         .group-sub-q { background: #f9f9f9; padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #e5e5ea; }
         .group-sub-text { font-size: 0.95em; line-height: 1.5; font-weight: bold; margin-bottom: 8px; color: var(--text-main); }
         .group-toggle-group { display: flex; gap: 10px; }
@@ -117,7 +114,6 @@
             margin: 10px 0 15px 0; text-align: left;
         }
 
-        /* モーダル */
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
         .modal-content { background:white; padding:20px; border-radius:16px; width:80%; max-width:360px; text-align:center; }
     </style>
@@ -125,14 +121,11 @@
 <body>
 
 <div id="app">
-    <!-- 1. セット選択・トップ画面 -->
     <div id="setup-screen" class="screen active">
         <h1>本免学科試験クイズ</h1>
         <h2>セットを選択してスタート</h2>
 
-        <div class="set-list" id="set-card-list">
-            <!-- JSで動的生成 -->
-        </div>
+        <div class="set-list" id="set-card-list"></div>
 
         <div style="font-weight:bold; font-size:0.9em; margin-bottom:6px; color:var(--text-main);">出題順</div>
         <div class="radio-group">
@@ -141,7 +134,6 @@
         </div>
     </div>
 
-    <!-- 2. クイズ画面 -->
     <div id="quiz-screen" class="screen">
         <div class="top-nav">
             <button class="btn-quit" onclick="quitQuiz()">✕ 中断して戻る</button>
@@ -153,12 +145,11 @@
             <div>ミス: <span id="mistake-count" style="color:var(--danger-color); font-weight:bold;">0</span> 問</div>
         </div>
 
-        <!-- 画像表示 -->
+        <!-- referrerpolicy="no-referrer" を追加して画像ブロックを回避 -->
         <div id="img-box" class="img-container" style="display:none;">
-            <img id="q-img" src="" alt="問題画像">
+            <img id="q-img" src="" alt="問題画像" referrerpolicy="no-referrer">
         </div>
 
-        <!-- 通常問題エリア -->
         <div id="single-q-box" style="display:none; flex-direction:column; flex-grow:1;">
             <div id="question-text">読み込み中...</div>
             <div id="answer-buttons" class="btn-ans-group">
@@ -167,7 +158,6 @@
             </div>
         </div>
 
-        <!-- イラスト問題一括エリア -->
         <div id="group-q-box" style="display:none; flex-direction:column; flex-grow:1;">
             <div style="font-weight:bold; font-size:0.95em; color:var(--primary-color); margin-bottom:10px;">
                 【イラスト問題】3つの記述すべての◯✕を選択してください（全正解で2点）
@@ -176,7 +166,6 @@
             <button id="btn-confirm-group" class="btn-primary" onclick="checkGroupAnswer()" disabled style="opacity:0.5;">回答を確定する</button>
         </div>
 
-        <!-- 判定・解説ボックス -->
         <div id="result-box">
             <div id="judgment"></div>
             <div id="explanation-container" class="explanation-box"></div>
@@ -184,7 +173,6 @@
         </div>
     </div>
 
-    <!-- 3. 結果画面 -->
     <div id="result-screen" class="screen" style="text-align: center; justify-content: center;">
         <h1 id="final-status">結果発表</h1>
         <div style="font-size: 3em; font-weight: bold; margin: 15px 0 5px 0;" id="final-score">0 点</div>
@@ -199,7 +187,6 @@
     </div>
 </div>
 
-<!-- 再開確認モーダル -->
 <div id="resume-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0;">中断データがあります</h3>
@@ -210,18 +197,16 @@
 </div>
 
 <script>
-    // 指定のGAS URL固定
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxaax0xEuJx68UF4tVIL21mwuXSx-S9h5qXiHxNwKAwxxTsm5w30ZwAe3qf44VqRHCR/exec";
 
     let selectedOrder = 'normal';
     let currentSetId = "1";
-    let groupedQuestions = []; // 大問単位で構造化した問題リスト
+    let groupedQuestions = [];
     let currentIndex = 0;
     let normalScore = 0;
     let totalMistakes = 0;
-    let groupUserAnswers = {}; // イラスト問題の現在の選択状態
+    let groupUserAnswers = {};
 
-    // 全7セットの定義
     const SETS_CONFIG = [
         { id: "1", name: "第 1 集" },
         { id: "2", name: "第 2 集" },
@@ -352,7 +337,6 @@
         }
     }
 
-    // 生データを大問構造に変換（通常問題1問、イラスト問題3小問一括）
     function processRawQuestions(rawData) {
         const grouped = [];
         let i = 0;
@@ -362,14 +346,7 @@
             const grp = (item.group || "").toString().trim();
 
             if (!grp) {
-                grouped.append ? grouped.push({
-                    type: "single",
-                    num: item.num,
-                    q: item.q,
-                    a: item.a,
-                    ex: item.ex,
-                    img: item.img || ""
-                }) : grouped.push({
+                grouped.push({
                     type: "single",
                     num: item.num,
                     q: item.q,
@@ -437,7 +414,6 @@
             document.getElementById('answer-buttons').style.display = 'flex';
             document.getElementById('question-text').innerText = currentStep.q;
         } else {
-            // イラスト問題（一括）
             document.getElementById('single-q-box').style.display = 'none';
             document.getElementById('group-q-box').style.display = 'flex';
             renderGroupQuestions(currentStep);
@@ -492,7 +468,6 @@
         }
     }
 
-    // 通常問題の回答判定（1点）
     function checkSingleAnswer(userAns) {
         document.getElementById('answer-buttons').style.display = 'none';
 
@@ -508,7 +483,6 @@
         showResultUI(isCorrect, `<strong>正解: ${step.a}</strong><br>${step.ex || '（解説なし）'}`);
     }
 
-    // イラスト問題の回答判定（3全正解で2点）
     function checkGroupAnswer() {
         document.getElementById('btn-confirm-group').style.display = 'none';
 
@@ -534,7 +508,7 @@
         });
 
         if (allCorrect) {
-            normalScore += 2; // 3問全正解で2点加算
+            normalScore += 2;
         }
 
         showResultUI(allCorrect, explanationHTML);
@@ -571,7 +545,6 @@
     function finishQuiz() {
         localStorage.removeItem('driver_quiz_active_save');
 
-        // 最高得点更新の保存
         const allProgress = JSON.parse(localStorage.getItem('driver_quiz_progress_map') || '{}');
         const prevMax = (allProgress[currentSetId] && allProgress[currentSetId].maxScore) || 0;
 
