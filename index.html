@@ -31,13 +31,22 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.08);
             padding: 16px 20px 20px 20px; box-sizing: border-box;
             display: flex; flex-direction: column;
-            min-height: 85vh;
+            min-height: 88vh;
         }
 
         .screen { display: none; flex-direction: column; height: 100%; flex-grow: 1; }
         .active { display: flex; }
 
-        h1 { font-size: 1.35em; text-align: center; color: var(--text-main); margin: 2px 0 2px 0; }
+        /* ヘッダー周り */
+        .title-bar {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;
+        }
+        h1 { font-size: 1.35em; text-align: center; color: var(--text-main); margin: 0; flex-grow: 1; }
+        .btn-reload {
+            background: none; border: none; font-size: 1.1em; cursor: pointer; padding: 2px 6px;
+            border-radius: 8px; background-color: #f2f2f7;
+        }
+
         h2 { font-size: 0.85em; color: var(--text-sub); text-align: center; margin-bottom: 12px; }
 
         .section-label { font-size: 0.88em; font-weight: bold; color: var(--text-main); margin: 10px 0 6px 0; display: flex; justify-content: space-between; align-items: center; }
@@ -62,7 +71,7 @@
 
         /* 複数範囲テストの履歴領域 */
         .multi-history-box {
-            background: #f2f2f7; border-radius: 10px; padding: 6px 10px; margin-bottom: 8px; font-size: 0.75em; color: var(--text-main);
+            background: #f2f2f7; border-radius: 10px; padding: 6px 10px; margin-bottom: 8px; font-size: 0.78em; color: var(--text-main);
         }
 
         .mode-group { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -91,7 +100,7 @@
         .btn-secondary { background-color: #8e8e93; }
         .btn-warning { background-color: var(--warning-color); }
 
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
         .btn-quit { background: none; border: none; color: var(--danger-color); font-size: 0.85em; font-weight: bold; cursor: pointer; padding: 0; }
         .btn-bookmark, .btn-jump {
             background: #f2f2f7; border: 1px solid #d1d1d6; border-radius: 20px;
@@ -103,23 +112,26 @@
 
         .quiz-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #e5e5ea; padding-bottom: 4px; margin-bottom: 8px;
+            border-bottom: 1px solid #e5e5ea; padding-bottom: 4px; margin-bottom: 12px;
             font-size: 0.82em; color: var(--text-sub);
         }
 
         /* 画像コンテナ */
         .img-container {
-            width: 100%; text-align: center; margin-bottom: 8px;
+            width: 100%; text-align: center; margin-bottom: 12px;
             display: flex; flex-direction: column; gap: 6px; align-items: center;
         }
         .img-container img { max-width: 100%; max-height: 150px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
-        /* 余白を詰めた問題文エリア */
-        #single-q-box { display: none; flex-direction: column; justify-content: space-between; margin-bottom: 6px; }
-        #question-text { font-size: 1.05em; line-height: 1.45; color: var(--text-main); margin-bottom: 10px; font-weight: 500; }
+        #single-q-box { display: none; flex-direction: column; justify-content: space-between; flex-grow: 1; }
+        #question-text {
+            font-size: 1.05em; line-height: 1.5; color: var(--text-main);
+            margin-bottom: 28px;
+            font-weight: 500;
+        }
         
-        .btn-ans-group { display: flex; gap: 10px; margin-bottom: 4px; }
-        .btn-ans { flex: 1; padding: 12px 0; font-size: 2.0em; border: none; border-radius: 14px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-ans-group { display: flex; gap: 10px; margin-bottom: 12px; }
+        .btn-ans { flex: 1; padding: 14px 0; font-size: 2.0em; border: none; border-radius: 14px; cursor: pointer; color: white; font-weight: bold; }
         #btn-true { background-color: var(--success-color); }
         #btn-false { background-color: var(--danger-color); }
 
@@ -143,14 +155,12 @@
             margin: 6px 0 10px 0; text-align: left;
         }
 
-        /* 画面移動用ボタンエリア */
-        .nav-btn-group { display: flex; gap: 8px; margin-top: 4px; }
-        .nav-btn-group button { flex: 1; margin-top: 0; padding: 12px; font-size: 0.95em; }
+        .nav-btn-group { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; }
+        .nav-btn-group button { flex: 1; margin-top: 0; padding: 12px; font-size: 0.9em; }
 
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
         .modal-content { background:white; padding:16px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
 
-        /* ジャンプ用グリッド */
         .jump-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -187,7 +197,11 @@
 
 <div id="app">
     <div id="setup-screen" class="screen active">
-        <h1>本免学科試験クイズ</h1>
+        <div class="title-bar">
+            <div style="width: 28px;"></div>
+            <h1>本免学科試験クイズ</h1>
+            <button class="btn-reload" onclick="forceReloadApp()" title="アプリを最新状態に更新">🔄</button>
+        </div>
         <h2>条件を選んでスタート</h2>
 
         <div class="section-label">
@@ -249,10 +263,12 @@
         <div id="result-box">
             <div id="judgment"></div>
             <div id="explanation-container" class="explanation-box"></div>
-            <div class="nav-btn-group">
-                <button id="prev-btn" class="btn-secondary" onclick="prevQuestion()">◀ 前の問へ</button>
-                <button id="next-btn" class="btn-primary" onclick="nextQuestion()">次の問題へ ▶</button>
-            </div>
+        </div>
+
+        <!-- 常時表示の前後移動ボタン -->
+        <div class="nav-btn-group">
+            <button id="prev-btn" class="btn-secondary" onclick="prevQuestion()">◀ 前の問へ</button>
+            <button id="next-btn" class="btn-primary" onclick="nextQuestion()">次の問題へ ▶</button>
         </div>
     </div>
 
@@ -308,8 +324,6 @@
     let totalMistakes = 0;
     let groupUserAnswers = {};
     let sessionMistakeSteps = [];
-    
-    // 解答保存用オブジェクト (index ➔ { isCorrect, explanationHTML, userAnswers })
     let stepResultsMap = {};
 
     const SETS_CONFIG = [
@@ -326,7 +340,18 @@
         renderSetCards();
     };
 
-    /* 直近5回の履歴を取得・描画する関数 */
+    /* 強制キャッシュクリア＆リロード */
+    function forceReloadApp() {
+        if (confirm("アプリのキャッシュをクリアして最新状態に更新しますか？")) {
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                });
+            }
+            window.location.reload(true);
+        }
+    }
+
     function renderSetCards() {
         const gridElem = document.getElementById('set-card-grid');
         gridElem.innerHTML = "";
@@ -338,7 +363,7 @@
             const isSelected = selectedSetIds.includes(set.id);
             card.className = "set-card" + (isSelected ? " selected" : "");
 
-            const history = historyMap[set.id] || []; // 配列 [80, 85, 92]
+            const history = historyMap[set.id] || [];
             let historyText = "未挑戦";
 
             if (history.length > 0) {
@@ -355,7 +380,6 @@
             gridElem.appendChild(card);
         });
 
-        // 複数選択時の履歴表示
         renderMultiHistory();
     }
 
@@ -367,17 +391,14 @@
         }
 
         const multiHistory = JSON.parse(localStorage.getItem('driver_quiz_multi_history') || '[]');
+        
         if (multiHistory.length === 0) {
-            multiBox.style.display = 'none';
-            return;
+            multiBox.innerHTML = `<strong>【複数選択履歴】</strong> 未挑戦`;
+        } else {
+            const last3 = multiHistory.slice(-3).reverse();
+            let itemsText = last3.map(item => `${item.sets.join(',')} ➔ ${item.score}点`).join(' | ');
+            multiBox.innerHTML = `<strong>【複数選択履歴】</strong> ${itemsText}`;
         }
-
-        const last3 = multiHistory.slice(-3).reverse();
-        let html = `<strong>【複数選択テストの直近履歴】</strong><br>`;
-        last3.forEach(item => {
-            html += `・[第${item.sets.join(',')}集] ${item.score}点 (${item.date})<br>`;
-        });
-        multiBox.innerHTML = html;
         multiBox.style.display = 'block';
     }
 
@@ -505,11 +526,10 @@
                 const bookmarkSet = new Set(JSON.parse(localStorage.getItem('driver_quiz_bookmarks') || '[]'));
 
                 if (selectedMode === 'weak') {
-                    // 正答率 80% 未満 (挑戦回数3回以上かつ 正解/挑戦 < 0.8) の問題を抽出
                     pool = pool.filter(step => {
                         const checkWeak = (key) => {
                             const stat = statsMap[key];
-                            if (!stat || stat.total < 3) return false;
+                            if (!stat || stat.total < 1) return false;
                             return (stat.correct / stat.total) < 0.8;
                         };
 
@@ -517,7 +537,7 @@
                         return step.items.some(item => checkWeak(item._uniqueKey));
                     });
                     if (pool.length === 0) {
-                        alert("選択した範囲内に挑戦3回以上かつ「正答率80%未満」の弱点問題はありませんでした！");
+                        alert("選択した範囲内に「正答率80%未満」の弱点問題はありませんでした！");
                         backToTop();
                         return;
                     }
@@ -788,7 +808,6 @@
         }
     }
 
-    /* 正答率算出用の統計更新 */
     function recordQuestionStat(uniqueKey, isCorrect) {
         const statsMap = JSON.parse(localStorage.getItem('driver_quiz_stats_map') || '{}');
         if (!statsMap[uniqueKey]) {
@@ -927,7 +946,7 @@
         }
     }
 
-    /* --- ジャンプ機能用ロジック（太枠と色の重複表示対応） --- */
+    /* --- ジャンプ機能用ロジック --- */
     function openJumpModal() {
         const grid = document.getElementById('jump-grid');
         grid.innerHTML = "";
@@ -1000,24 +1019,19 @@
     function finishQuiz() {
         localStorage.removeItem('driver_quiz_active_save');
 
-        // 完答時の履歴保存ロジック（直近5回）
         if (selectedMode === 'all') {
             if (selectedSetIds.length === 1) {
-                // 単一集の場合 ➔ その集の履歴配列に追加
                 const setId = selectedSetIds[0];
                 const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
                 if (!historyMap[setId]) historyMap[setId] = [];
                 historyMap[setId].push(normalScore);
-                if (historyMap[setId].length > 10) historyMap[setId].shift(); // 最大10保存
+                if (historyMap[setId].length > 10) historyMap[setId].shift();
                 localStorage.setItem('driver_quiz_history_map', JSON.stringify(historyMap));
             } else {
-                // 複数集選択の場合 ➔ 複数用履歴に追加
                 const multiHistory = JSON.parse(localStorage.getItem('driver_quiz_multi_history') || '[]');
-                const dateStr = new Date().toLocaleDateString('ja-JP', { month: '2-digit', day: '2-digit' });
                 multiHistory.push({
                     sets: selectedSetIds,
-                    score: normalScore,
-                    date: dateStr
+                    score: normalScore
                 });
                 if (multiHistory.length > 10) multiHistory.shift();
                 localStorage.setItem('driver_quiz_multi_history', JSON.stringify(multiHistory));
