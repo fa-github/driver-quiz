@@ -102,7 +102,11 @@
             font-size: 0.85em; color: var(--text-sub);
         }
 
-        .img-container { width: 100%; text-align: center; margin-bottom: 12px; }
+        /* 複数画像表示対応コンテナ */
+        .img-container {
+            width: 100%; text-align: center; margin-bottom: 12px;
+            display: flex; flex-direction: column; gap: 8px; align-items: center;
+        }
         .img-container img { max-width: 100%; max-height: 170px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
         #question-text { font-size: 1.1em; line-height: 1.5; color: var(--text-main); margin-bottom: 18px; flex-grow: 1; font-weight: 500; }
@@ -208,9 +212,8 @@
             <div>ミス: <span id="mistake-count" style="color:var(--danger-color); font-weight:bold;">0</span> 問</div>
         </div>
 
-        <div id="img-box" class="img-container" style="display:none;">
-            <img id="q-img" src="" alt="問題画像" referrerpolicy="no-referrer">
-        </div>
+        <!-- 複数画像対応の画像コンテナ -->
+        <div id="img-box" class="img-container" style="display:none;"></div>
 
         <div id="single-q-box" style="display:none; flex-direction:column; flex-grow:1;">
             <div id="question-text">読み込み中...</div>
@@ -570,12 +573,28 @@
 
         updateBookmarkUI();
 
+        /* --- 複数画像表示のレンダリング処理 --- */
         const imgBox = document.getElementById('img-box');
-        const qImg = document.getElementById('q-img');
+        imgBox.innerHTML = "";
 
-        if (currentStep.img && currentStep.img !== "") {
-            qImg.src = currentStep.img;
-            imgBox.style.display = 'block';
+        const rawImgStr = (currentStep.img || "").toString().trim();
+
+        if (rawImgStr !== "") {
+            // 改行またはカンマで分割
+            const imgUrls = rawImgStr.split(/[\r\n,]+/).map(s => s.trim()).filter(s => s !== "");
+
+            if (imgUrls.length > 0) {
+                imgUrls.forEach(url => {
+                    const imgElem = document.createElement('img');
+                    imgElem.src = url;
+                    imgElem.alt = "問題画像";
+                    imgElem.referrerPolicy = "no-referrer";
+                    imgBox.appendChild(imgElem);
+                });
+                imgBox.style.display = 'flex';
+            } else {
+                imgBox.style.display = 'none';
+            }
         } else {
             imgBox.style.display = 'none';
         }
