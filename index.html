@@ -63,7 +63,7 @@
         .set-status { font-size: 0.72em; color: var(--text-sub); margin-top: 3px; font-weight: 500; }
         .history-dots { color: var(--primary-color); font-weight: bold; }
 
-        /* 複数範囲テストの履歴領域（完全常時表示） */
+        /* 複数範囲テストの履歴領域 */
         .multi-history-box {
             background: #f2f2f7; border: 1px solid #d1d1d6; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.78em; color: var(--text-main); text-align: left;
         }
@@ -116,11 +116,11 @@
         }
         .img-container img { max-width: 100%; max-height: 150px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
-        /* 問題文とボタンの間隔（flex-startに設定） */
+        /* 問題文とボタンの間隔（40pxに設定） */
         #single-q-box { display: none; flex-direction: column; justify-content: flex-start; flex-grow: 1; }
         #question-text {
             font-size: 1.05em; line-height: 1.5; color: var(--text-main);
-            margin-bottom: 40px;
+            margin-bottom: 40px; /* ← 指定の 40px */
             font-weight: 500;
         }
         
@@ -259,6 +259,7 @@
             <div id="explanation-container" class="explanation-box"></div>
         </div>
 
+        <!-- タイトルを「◀ 前の問題へ」に修正統一 -->
         <div class="nav-btn-group">
             <button id="prev-btn" class="btn-secondary" onclick="prevQuestion()">◀ 前の問題へ</button>
             <button id="next-btn" class="btn-primary" onclick="nextQuestion()">次の問題へ ▶</button>
@@ -344,6 +345,10 @@
         }
     }
 
+    function getActiveSaveKey() {
+        return selectedSetIds.slice().sort().join(',');
+    }
+
     function renderSetCards() {
         const gridElem = document.getElementById('set-card-grid');
         gridElem.innerHTML = "";
@@ -375,7 +380,6 @@
         renderMultiHistory();
     }
 
-    /* 複数選択履歴の完全常時表示ロジック */
     function renderMultiHistory() {
         const multiBox = document.getElementById('multi-history-area');
         const multiHistory = JSON.parse(localStorage.getItem('driver_quiz_multi_history') || '[]');
@@ -422,10 +426,15 @@
         elem.classList.add('selected');
     }
 
+    /* 範囲ごとに独立した中断チェック */
     function startQuizFromSetup() {
-        const activeSave = JSON.parse(localStorage.getItem('driver_quiz_active_save') || 'null');
+        const key = getActiveSaveKey();
+        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
+        const activeSave = activeSavesMap[key];
+
         if (activeSave) {
-            document.getElementById('modal-desc').innerText = `保存された進行データ（${activeSave.currentIndex + 1}問目）があります。`;
+            let labelName = selectedSetIds.length === 1 ? `第 ${selectedSetIds[0]} 集` : `複数選択（${selectedSetIds.join(',')}）`;
+            document.getElementById('modal-desc').innerText = `${labelName} の中断データ（${activeSave.currentIndex + 1}問目）があります。`;
             document.getElementById('resume-modal').style.display = 'flex';
         } else {
             fetchAndStartQuiz(false);
@@ -434,10 +443,14 @@
 
     function confirmResume(shouldResume) {
         document.getElementById('resume-modal').style.display = 'none';
+        const key = getActiveSaveKey();
+        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
+
         if (shouldResume) {
             fetchAndStartQuiz(true);
         } else {
-            localStorage.removeItem('driver_quiz_active_save');
+            delete activeSavesMap[key];
+            localStorage.setItem('driver_quiz_active_saves_map', JSON.stringify(activeSavesMap));
             fetchAndStartQuiz(false);
         }
     }
@@ -446,8 +459,12 @@
         document.getElementById('setup-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
 
+        const key = getActiveSaveKey();
+
         if (isResume) {
-            const activeSave = JSON.parse(localStorage.getItem('driver_quiz_active_save'));
+            const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
+            const activeSave = activeSavesMap[key];
+
             groupedQuestions = activeSave.groupedQuestions;
             currentIndex = activeSave.currentIndex;
             normalScore = activeSave.normalScore;
@@ -615,8 +632,12 @@
         return { singles, groups: Object.values(groupsMap) };
     }
 
+    /* 範囲ごとに中断データを保存 */
     function saveActiveProgress() {
-        const activeSave = {
+        const key = getActiveSaveKey();
+        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
+
+        activeSavesMap[key] = {
             selectedSetIds: selectedSetIds,
             selectedMode: selectedMode,
             selectedOrder: selectedOrder,
@@ -627,7 +648,8 @@
             sessionMistakeSteps: sessionMistakeSteps,
             stepResultsMap: stepResultsMap
         };
-        localStorage.setItem('driver_quiz_active_save', JSON.stringify(activeSave));
+
+        localStorage.setItem('driver_quiz_active_saves_map', JSON.stringify(activeSavesMap));
     }
 
     function showQuestion() {
@@ -642,7 +664,6 @@
 
         updateBookmarkUI();
 
-        /* --- 複数画像表示のレンダリング処理 --- */
         const imgBox = document.getElementById('img-box');
         imgBox.innerHTML = "";
 
@@ -1004,7 +1025,11 @@
     }
 
     function finishQuiz() {
-        localStorage.removeItem('driver_quiz_active_save');
+        // 完答時はその範囲の中断データを削除
+        const key = getActiveSaveKey();
+        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
+        delete activeSavesMap[key];
+        localStorage.setItem('driver_quiz_active_saves_map', JSON.stringify(activeSavesMap));
 
         if (selectedMode === 'all') {
             if (selectedSetIds.length === 1) {
