@@ -43,7 +43,7 @@
         .section-label { font-size: 0.9em; font-weight: bold; color: var(--text-main); margin: 12px 0 6px 0; display: flex; justify-content: space-between; align-items: center; }
         .btn-link { background: none; border: none; color: var(--primary-color); font-size: 0.85em; font-weight: bold; cursor: pointer; padding: 0; }
 
-        /* セット選択カード（複数選択） */
+        /* セット選択カード */
         .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .set-card {
             background-color: #f9f9f9;
@@ -60,7 +60,6 @@
         .set-status { font-size: 0.75em; font-weight: bold; color: var(--text-sub); margin-top: 4px; }
         .status-badge-pass { color: var(--success-color); }
 
-        /* 出題モード選択ボタン */
         .mode-group { display: flex; gap: 6px; margin-bottom: 10px; }
         .mode-btn {
             flex: 1; padding: 10px 4px; text-align: center;
@@ -103,7 +102,6 @@
             font-size: 0.85em; color: var(--text-sub);
         }
 
-        /* 画像表示エリア */
         .img-container { width: 100%; text-align: center; margin-bottom: 12px; }
         .img-container img { max-width: 100%; max-height: 170px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
@@ -140,7 +138,6 @@
 <body>
 
 <div id="app">
-    <!-- 1. トップ画面 -->
     <div id="setup-screen" class="screen active">
         <h1>本免学科試験クイズ</h1>
         <h2>条件を選んでスタート</h2>
@@ -153,7 +150,7 @@
 
         <div class="section-label">2. 出題モード</div>
         <div class="mode-group">
-            <div class="mode-btn selected" id="mode-all" onclick="selectMode('all')">通常問題</div>
+            <div class="mode-btn selected" id="mode-all" onclick="selectMode('all')">模擬試験（95問/100点）</div>
             <div class="mode-btn" id="mode-weak" onclick="selectMode('weak')">弱点 (ミス2回+)</div>
             <div class="mode-btn" id="mode-bm" onclick="selectMode('bm')">★ ブックマーク</div>
         </div>
@@ -167,7 +164,6 @@
         <button class="btn-primary" onclick="startQuizFromSetup()">学習を開始する</button>
     </div>
 
-    <!-- 2. クイズ画面 -->
     <div id="quiz-screen" class="screen">
         <div class="top-nav">
             <button class="btn-quit" onclick="quitQuiz()">✕ 中断して戻る</button>
@@ -180,12 +176,10 @@
             <div>ミス: <span id="mistake-count" style="color:var(--danger-color); font-weight:bold;">0</span> 問</div>
         </div>
 
-        <!-- 画像表示 -->
         <div id="img-box" class="img-container" style="display:none;">
             <img id="q-img" src="" alt="問題画像" referrerpolicy="no-referrer">
         </div>
 
-        <!-- 通常問題 -->
         <div id="single-q-box" style="display:none; flex-direction:column; flex-grow:1;">
             <div id="question-text">読み込み中...</div>
             <div id="answer-buttons" class="btn-ans-group">
@@ -194,7 +188,6 @@
             </div>
         </div>
 
-        <!-- イラスト問題（一括） -->
         <div id="group-q-box" style="display:none; flex-direction:column; flex-grow:1;">
             <div style="font-weight:bold; font-size:0.9em; color:var(--primary-color); margin-bottom:8px;">
                 【イラスト問題】3つの記述すべての◯✕を選択してください（全正解で2点）
@@ -203,7 +196,6 @@
             <button id="btn-confirm-group" class="btn-primary" onclick="checkGroupAnswer()" disabled style="opacity:0.5;">回答を確定する</button>
         </div>
 
-        <!-- 判定・解説 -->
         <div id="result-box">
             <div id="judgment"></div>
             <div id="explanation-container" class="explanation-box"></div>
@@ -211,7 +203,6 @@
         </div>
     </div>
 
-    <!-- 3. 結果画面 -->
     <div id="result-screen" class="screen" style="text-align: center; justify-content: center;">
         <h1 id="final-status">結果発表</h1>
         <div style="font-size: 2.8em; font-weight: bold; margin: 10px 0 2px 0;" id="final-score">0 点</div>
@@ -227,7 +218,6 @@
     </div>
 </div>
 
-<!-- 中断・再開モーダル -->
 <div id="resume-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0;">中断データがあります</h3>
@@ -240,8 +230,8 @@
 <script>
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxaax0xEuJx68UF4tVIL21mwuXSx-S9h5qXiHxNwKAwxxTsm5w30ZwAe3qf44VqRHCR/exec";
 
-    let selectedSetIds = ["1"]; // デフォルト第1集
-    let selectedMode = 'all'; // 'all', 'weak', 'bm'
+    let selectedSetIds = ["1"];
+    let selectedMode = 'all';
     let selectedOrder = 'normal';
 
     let groupedQuestions = [];
@@ -249,7 +239,7 @@
     let normalScore = 0;
     let totalMistakes = 0;
     let groupUserAnswers = {};
-    let sessionMistakeSteps = []; // 今回セッションで間違えた大問ステップ
+    let sessionMistakeSteps = [];
 
     const SETS_CONFIG = [
         { id: "1", name: "第 1 集" },
@@ -371,7 +361,6 @@
         document.getElementById('question-text').innerText = "データを読み込んでいます...";
 
         try {
-            // 選択された複数セットのデータを並列取得
             const fetchPromises = selectedSetIds.map(id => 
                 fetch(`${GAS_API_URL}?set=set${id}`).then(r => r.json()).catch(() => [])
             );
@@ -395,44 +384,58 @@
                 return;
             }
 
-            groupedQuestions = processRawQuestions(combinedRaw);
+            const { singles, groups } = processRawQuestionsToPools(combinedRaw);
 
-            // モードによる抽出フィルター
-            const mistakeMap = JSON.parse(localStorage.getItem('driver_quiz_mistake_map') || '{}');
-            const bookmarkSet = new Set(JSON.parse(localStorage.getItem('driver_quiz_bookmarks') || '[]'));
+            if (selectedMode === 'all') {
+                // 通常テストモード：90問の通常問題 ＋ 5問のイラスト問題 ＝ 全95ステップ（100点満点）
+                // 1. 通常問題 pool から 90問シャッフル抽出
+                singles.sort(() => Math.random() - 0.5);
+                const pickedSingles = singles.slice(0, 90);
 
-            if (selectedMode === 'weak') {
-                // ミス2回以上の問題を抽出
-                groupedQuestions = groupedQuestions.filter(step => {
-                    if (step.type === 'single') {
-                        return (mistakeMap[step.uniqueKey] || 0) >= 2;
-                    } else {
+                // 2. イラスト問題 pool から 5問シャッフル抽出
+                groups.sort(() => Math.random() - 0.5);
+                const pickedGroups = groups.slice(0, 5);
+
+                // 順番通りモードの場合は番号順ソート、ランダムモードなら混ざる
+                if (selectedOrder === 'normal') {
+                    pickedSingles.sort((a,b) => parseInt(a.num) - parseInt(b.num));
+                    // 最後にイラスト問題を配置
+                    groupedQuestions = [...pickedSingles, ...pickedGroups];
+                } else {
+                    groupedQuestions = [...pickedSingles, ...pickedGroups].sort(() => Math.random() - 0.5);
+                }
+            } else {
+                // 弱点 / ブックマーク モード
+                let pool = [...singles, ...groups];
+                const mistakeMap = JSON.parse(localStorage.getItem('driver_quiz_mistake_map') || '{}');
+                const bookmarkSet = new Set(JSON.parse(localStorage.getItem('driver_quiz_bookmarks') || '[]'));
+
+                if (selectedMode === 'weak') {
+                    pool = pool.filter(step => {
+                        if (step.type === 'single') return (mistakeMap[step.uniqueKey] || 0) >= 2;
                         return step.items.some(item => (mistakeMap[item._uniqueKey] || 0) >= 2);
+                    });
+                    if (pool.length === 0) {
+                        alert("選択した範囲内にミス2回以上の「弱点問題」はありませんでした！");
+                        backToTop();
+                        return;
                     }
-                });
-                if (groupedQuestions.length === 0) {
-                    alert("選択した範囲内にミス2回以上の「弱点問題」はありませんでした！");
-                    backToTop();
-                    return;
-                }
-            } else if (selectedMode === 'bm') {
-                // ブックマーク問題を抽出
-                groupedQuestions = groupedQuestions.filter(step => {
-                    if (step.type === 'single') {
-                        return bookmarkSet.has(step.uniqueKey);
-                    } else {
+                } else if (selectedMode === 'bm') {
+                    pool = pool.filter(step => {
+                        if (step.type === 'single') return bookmarkSet.has(step.uniqueKey);
                         return step.items.some(item => bookmarkSet.has(item._uniqueKey));
+                    });
+                    if (pool.length === 0) {
+                        alert("選択した範囲内に「★ ブックマーク」された問題はありませんでした！");
+                        backToTop();
+                        return;
                     }
-                });
-                if (groupedQuestions.length === 0) {
-                    alert("選択した範囲内に「★ ブックマーク」された問題はありませんでした！");
-                    backToTop();
-                    return;
                 }
-            }
 
-            if (selectedOrder === 'random') {
-                groupedQuestions.sort(() => Math.random() - 0.5);
+                if (selectedOrder === 'random') {
+                    pool.sort(() => Math.random() - 0.5);
+                }
+                groupedQuestions = pool;
             }
 
             currentIndex = 0;
@@ -450,8 +453,9 @@
         }
     }
 
-    function processRawQuestions(rawData) {
-        const grouped = [];
+    function processRawQuestionsToPools(rawData) {
+        const singles = [];
+        const groupsMap = {};
         let i = 0;
 
         while (i < rawData.length) {
@@ -459,7 +463,7 @@
             const grp = (item.group || "").toString().trim();
 
             if (!grp) {
-                grouped.push({
+                singles.push({
                     type: "single",
                     setId: item._setId,
                     uniqueKey: item._uniqueKey,
@@ -482,16 +486,18 @@
                     i++;
                 }
 
-                grouped.push({
+                singles.push ? null : null;
+                const groupKey = `${currentSetId}-${groupId}`;
+                groupsMap[groupKey] = {
                     type: "group",
                     setId: currentSetId,
                     group: groupId,
                     img: item.img || "",
                     items: groupItems
-                });
+                };
             }
         }
-        return grouped;
+        return { singles, groups: Object.values(groupsMap) };
     }
 
     function saveActiveProgress() {
@@ -518,7 +524,6 @@
 
         const currentStep = groupedQuestions[currentIndex];
 
-        // ブックマーク状態の表示更新
         updateBookmarkUI();
 
         const imgBox = document.getElementById('img-box');
@@ -722,7 +727,6 @@
     function finishQuiz() {
         localStorage.removeItem('driver_quiz_active_save');
 
-        // 最高得点の保存（単一セット時）
         if (selectedSetIds.length === 1 && selectedMode === 'all') {
             const setId = selectedSetIds[0];
             const allProgress = JSON.parse(localStorage.getItem('driver_quiz_progress_map') || '{}');
@@ -749,7 +753,6 @@
             passElem.style.color = "var(--danger-color)";
         }
 
-        // 今回間違えた問題のリトライボタン表示設定
         const retryBtn = document.getElementById('btn-retry-mistakes');
         if (sessionMistakeSteps.length > 0) {
             retryBtn.style.display = 'block';
