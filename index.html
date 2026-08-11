@@ -44,31 +44,31 @@
         h2 { font-size: 0.85em; color: var(--text-sub); text-align: center; margin-bottom: 12px; }
 
         .section-label { font-size: 0.88em; font-weight: bold; color: var(--text-main); margin: 10px 0 6px 0; display: flex; justify-content: space-between; align-items: center; }
-        .btn-link { background: none; border: none; color: var(--primary-color); font-size: 0.82em; font-weight: bold; cursor: pointer; padding: 0; }
 
-        /* セット選択カード */
-        .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+        /* まとめ選択ボタンエリア */
+        .combo-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+        .combo-card {
+            background-color: #f9f9f9; border: 2px solid #e5e5ea; border-radius: 12px;
+            padding: 6px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 54px; text-align: center; box-sizing: border-box; transition: all 0.2s;
+        }
+        .combo-card.selected { border-color: var(--primary-color); background-color: #e5f1ff; }
+        .combo-title { font-size: 0.85em; font-weight: bold; color: var(--text-main); }
+
+        /* 単体カード */
+        .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
         .set-card {
-            background-color: #f9f9f9;
-            border: 2px solid #e5e5ea;
-            border-radius: 12px;
-            padding: 8px 10px;
-            cursor: pointer;
-            display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 52px;
-            transition: all 0.2s;
+            background-color: #f9f9f9; border: 2px solid #e5e5ea; border-radius: 12px;
+            padding: 8px 10px; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-start;
+            min-height: 60px; box-sizing: border-box; transition: all 0.2s;
         }
         .set-card.selected { border-color: var(--primary-color); background-color: #e5f1ff; }
-        .set-title { font-size: 0.9em; font-weight: bold; color: var(--text-main); }
-        .set-status { font-size: 0.72em; color: var(--text-sub); margin-top: 3px; font-weight: 500; }
+        .set-title { font-size: 0.9em; font-weight: bold; color: var(--text-main); line-height: 1.2; }
+        .set-status { font-size: 0.72em; color: var(--text-sub); margin-top: 3px; font-weight: 500; line-height: 1.2; }
+        .set-resume-badge { font-size: 0.75em; color: var(--warning-color); font-weight: bold; margin-top: 2px; line-height: 1.2; }
         .history-dots { color: var(--primary-color); font-weight: bold; }
 
-        /* 複数範囲テストの履歴領域 */
-        .multi-history-box {
-            background: #f2f2f7; border: 1px solid #d1d1d6; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.78em; color: var(--text-main); text-align: left;
-        }
-
-        .mode-group { display: flex; gap: 6px; margin-bottom: 8px; }
+        .mode-group { display: flex; gap: 6px; margin-bottom: 12px; }
         .mode-btn {
             flex: 1; padding: 8px 4px; text-align: center;
             border: 1px solid #d1d1d6; border-radius: 10px;
@@ -76,15 +76,6 @@
             font-size: 0.8em; color: var(--text-main);
         }
         .mode-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
-
-        .radio-group { display: flex; gap: 8px; margin-bottom: 12px; }
-        .radio-btn {
-            flex: 1; padding: 8px; text-align: center;
-            border: 1px solid #d1d1d6; border-radius: 10px;
-            cursor: pointer; font-weight: bold; background-color: #f9f9f9;
-            font-size: 0.82em;
-        }
-        .radio-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
         .btn-primary, .btn-secondary, .btn-warning {
             background-color: var(--primary-color); color: white; border: none;
@@ -116,11 +107,10 @@
         }
         .img-container img { max-width: 100%; max-height: 150px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
-        /* 問題文とボタンの間隔（40pxに設定） */
         #single-q-box { display: none; flex-direction: column; justify-content: flex-start; flex-grow: 1; }
         #question-text {
             font-size: 1.05em; line-height: 1.5; color: var(--text-main);
-            margin-bottom: 40px; /* ← 指定の 40px */
+            margin-bottom: 40px;
             font-weight: 500;
         }
         
@@ -198,26 +188,32 @@
         </div>
         <h2>条件を選んでスタート</h2>
 
-        <div class="section-label">
-            <span>1. 出題範囲（複数選択可能）</span>
-            <button class="btn-link" onclick="toggleSelectAllSets()">全選択 / 解除</button>
+        <div class="section-label">1. 出題範囲を選択</div>
+        
+        <!-- まとめ範囲選択ボタン -->
+        <div class="combo-grid">
+            <div class="combo-card" id="combo-1-3" onclick="selectRange('1-3')">
+                <div class="combo-title">1〜3（前半）</div>
+                <div class="set-status" id="status-1-3">未挑戦</div>
+            </div>
+            <div class="combo-card" id="combo-4-7" onclick="selectRange('4-7')">
+                <div class="combo-title">4〜7（後半）</div>
+                <div class="set-status" id="status-4-7">未挑戦</div>
+            </div>
+            <div class="combo-card" id="combo-all" onclick="selectRange('1-7')">
+                <div class="combo-title">すべて（1〜7）</div>
+                <div class="set-status" id="status-all">未挑戦</div>
+            </div>
         </div>
-        <div class="set-grid" id="set-card-grid"></div>
 
-        <!-- 完全常時表示の複数範囲履歴エリア -->
-        <div id="multi-history-area" class="multi-history-box"></div>
+        <!-- 各集単体カード -->
+        <div class="set-grid" id="set-card-grid"></div>
 
         <div class="section-label">2. 出題モード</div>
         <div class="mode-group">
             <div class="mode-btn selected" id="mode-all" onclick="selectMode('all')">模擬試験（95問/100点）</div>
             <div class="mode-btn" id="mode-weak" onclick="selectMode('weak')">弱点 (正答80%未満)</div>
             <div class="mode-btn" id="mode-bm" onclick="selectMode('bm')">★ ブックマーク</div>
-        </div>
-
-        <div class="section-label">3. 出題順</div>
-        <div class="radio-group">
-            <div class="radio-btn selected" onclick="selectOrder('normal', this)">順番通り</div>
-            <div class="radio-btn" onclick="selectOrder('random', this)">ランダム</div>
         </div>
 
         <button class="btn-primary" onclick="startQuizFromSetup()">学習を開始する</button>
@@ -259,7 +255,6 @@
             <div id="explanation-container" class="explanation-box"></div>
         </div>
 
-        <!-- タイトルを「◀ 前の問題へ」に修正統一 -->
         <div class="nav-btn-group">
             <button id="prev-btn" class="btn-secondary" onclick="prevQuestion()">◀ 前の問題へ</button>
             <button id="next-btn" class="btn-primary" onclick="nextQuestion()">次の問題へ ▶</button>
@@ -290,7 +285,6 @@
     </div>
 </div>
 
-<!-- 問題ジャンプ用モーダル -->
 <div id="jump-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0; margin-bottom:2px;">問題番号を選択</h3>
@@ -308,9 +302,9 @@
 <script>
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxaax0xEuJx68UF4tVIL21mwuXSx-S9h5qXiHxNwKAwxxTsm5w30ZwAe3qf44VqRHCR/exec";
 
-    let selectedSetIds = ["1"];
+    // 選択中の出題範囲 (例: "1", "1-3", "4-7", "1-7")
+    let selectedRangeKey = "1";
     let selectedMode = 'all';
-    let selectedOrder = 'normal';
 
     let groupedQuestions = [];
     let currentIndex = 0;
@@ -345,19 +339,61 @@
         }
     }
 
-    function getActiveSaveKey() {
-        return selectedSetIds.slice().sort().join(',');
+    function getSaveKey() {
+        return `save_${selectedMode}_${selectedRangeKey}`;
+    }
+
+    /* 範囲指定から実際のセットIDリストを取得 */
+    function getSelectedSetIds() {
+        if (selectedRangeKey === "1-3") return ["1", "2", "3"];
+        if (selectedRangeKey === "4-7") return ["4", "5", "6", "7"];
+        if (selectedRangeKey === "1-7") return ["1", "2", "3", "4", "5", "6", "7"];
+        return [selectedRangeKey];
+    }
+
+    function selectRange(key) {
+        selectedRangeKey = key;
+        renderSetCards();
     }
 
     function renderSetCards() {
+        const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
+        const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
+
+        // まとめボタン描画
+        ["1-3", "4-7", "1-7"].forEach(comboKey => {
+            const idKey = comboKey === "1-7" ? "all" : comboKey;
+            const elem = document.getElementById(`combo-${idKey}`);
+            const statusElem = document.getElementById(`status-${idKey}`);
+
+            if (selectedRangeKey === comboKey) {
+                elem.classList.add('selected');
+            } else {
+                elem.classList.remove('selected');
+            }
+
+            const history = historyMap[comboKey] || [];
+            let statusHTML = "未挑戦";
+            if (history.length > 0) {
+                const last3 = history.slice(-3);
+                statusHTML = `<span class="history-dots">${last3.join('➔')}点</span>`;
+            }
+
+            const save = savesMap[`save_${selectedMode}_${comboKey}`];
+            if (save && save.groupedQuestions) {
+                statusHTML += `<br><span style="color:var(--warning-color); font-weight:bold;">途中:${save.currentIndex + 1}/${save.groupedQuestions.length}</span>`;
+            }
+
+            statusElem.innerHTML = statusHTML;
+        });
+
+        // 単体カード描画
         const gridElem = document.getElementById('set-card-grid');
         gridElem.innerHTML = "";
 
-        const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
-
         SETS_CONFIG.forEach(set => {
             const card = document.createElement('div');
-            const isSelected = selectedSetIds.includes(set.id);
+            const isSelected = (selectedRangeKey === set.id);
             card.className = "set-card" + (isSelected ? " selected" : "");
 
             const history = historyMap[set.id] || [];
@@ -368,73 +404,37 @@
                 historyText = `直近: <span class="history-dots">${last5.join(' ➔ ')}点</span>`;
             }
 
+            const singleSaveKey = `save_${selectedMode}_${set.id}`;
+            const singleSave = savesMap[singleSaveKey];
+            let resumeText = "";
+            if (singleSave && singleSave.groupedQuestions) {
+                resumeText = `<div class="set-resume-badge">途中: ${singleSave.currentIndex + 1}/${singleSave.groupedQuestions.length}問</div>`;
+            }
+
             card.innerHTML = `
                 <div class="set-title">${set.name}</div>
                 <div class="set-status">${historyText}</div>
+                ${resumeText}
             `;
 
-            card.onclick = () => toggleSetSelection(set.id);
+            card.onclick = () => selectRange(set.id);
             gridElem.appendChild(card);
         });
-
-        renderMultiHistory();
-    }
-
-    function renderMultiHistory() {
-        const multiBox = document.getElementById('multi-history-area');
-        const multiHistory = JSON.parse(localStorage.getItem('driver_quiz_multi_history') || '[]');
-        
-        if (multiHistory.length === 0) {
-            multiBox.innerHTML = `<strong>【複数選択履歴】</strong> 未挑戦`;
-        } else {
-            const last3 = multiHistory.slice(-3).reverse();
-            let itemsText = last3.map(item => `${item.sets.join(',')} ➔ ${item.score}点`).join(' | ');
-            multiBox.innerHTML = `<strong>【複数選択履歴】</strong> ${itemsText}`;
-        }
-        multiBox.style.display = 'block';
-    }
-
-    function toggleSetSelection(setId) {
-        if (selectedSetIds.includes(setId)) {
-            if (selectedSetIds.length > 1) {
-                selectedSetIds = selectedSetIds.filter(id => id !== setId);
-            }
-        } else {
-            selectedSetIds.push(setId);
-        }
-        renderSetCards();
-    }
-
-    function toggleSelectAllSets() {
-        if (selectedSetIds.length === SETS_CONFIG.length) {
-            selectedSetIds = ["1"];
-        } else {
-            selectedSetIds = SETS_CONFIG.map(s => s.id);
-        }
-        renderSetCards();
     }
 
     function selectMode(mode) {
         selectedMode = mode;
         document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('selected'));
         document.getElementById(`mode-${mode}`).classList.add('selected');
+        renderSetCards();
     }
 
-    function selectOrder(mode, elem) {
-        selectedOrder = mode;
-        document.querySelectorAll('.radio-btn').forEach(btn => btn.classList.remove('selected'));
-        elem.classList.add('selected');
-    }
-
-    /* 範囲ごとに独立した中断チェック */
     function startQuizFromSetup() {
-        const key = getActiveSaveKey();
-        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
-        const activeSave = activeSavesMap[key];
+        const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
+        const activeSave = savesMap[getSaveKey()];
 
         if (activeSave) {
-            let labelName = selectedSetIds.length === 1 ? `第 ${selectedSetIds[0]} 集` : `複数選択（${selectedSetIds.join(',')}）`;
-            document.getElementById('modal-desc').innerText = `${labelName} の中断データ（${activeSave.currentIndex + 1}問目）があります。`;
+            document.getElementById('modal-desc').innerText = `保存された進行データ（${activeSave.currentIndex + 1}/${activeSave.groupedQuestions.length}問目）があります。`;
             document.getElementById('resume-modal').style.display = 'flex';
         } else {
             fetchAndStartQuiz(false);
@@ -443,14 +443,12 @@
 
     function confirmResume(shouldResume) {
         document.getElementById('resume-modal').style.display = 'none';
-        const key = getActiveSaveKey();
-        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
-
         if (shouldResume) {
             fetchAndStartQuiz(true);
         } else {
-            delete activeSavesMap[key];
-            localStorage.setItem('driver_quiz_active_saves_map', JSON.stringify(activeSavesMap));
+            const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
+            delete savesMap[getSaveKey()];
+            localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
             fetchAndStartQuiz(false);
         }
     }
@@ -459,12 +457,9 @@
         document.getElementById('setup-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
 
-        const key = getActiveSaveKey();
-
         if (isResume) {
-            const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
-            const activeSave = activeSavesMap[key];
-
+            const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
+            const activeSave = savesMap[getSaveKey()];
             groupedQuestions = activeSave.groupedQuestions;
             currentIndex = activeSave.currentIndex;
             normalScore = activeSave.normalScore;
@@ -484,14 +479,15 @@
         document.getElementById('question-text').innerText = "データを読み込んでいます...";
 
         try {
-            const fetchPromises = selectedSetIds.map(id => 
+            const targetSetIds = getSelectedSetIds();
+            const fetchPromises = targetSetIds.map(id => 
                 fetch(`${GAS_API_URL}?set=set${id}`).then(r => r.json()).catch(() => [])
             );
             const results = await Promise.all(fetchPromises);
 
             let combinedRaw = [];
             results.forEach((rawData, idx) => {
-                const setId = selectedSetIds[idx];
+                const setId = targetSetIds[idx];
                 if (Array.isArray(rawData)) {
                     rawData.forEach(item => {
                         item._setId = setId;
@@ -510,17 +506,17 @@
             const { singles, groups } = processRawQuestionsToPools(combinedRaw);
 
             if (selectedMode === 'all') {
-                if (selectedOrder === 'normal') {
+                if (targetSetIds.length === 1) {
+                    // 単一集選択時は順番通り
                     singles.sort((a,b) => parseInt(a.num) - parseInt(b.num));
                     groups.sort((a,b) => parseInt(a.group) - parseInt(b.group));
-
                     const pickedSingles = singles.slice(0, 90);
                     const pickedGroups = groups.slice(0, 5);
                     groupedQuestions = [...pickedSingles, ...pickedGroups];
                 } else {
+                    // 複数範囲（1-3, 4-7, 1-7）はランダムピックアップ
                     singles.sort(() => Math.random() - 0.5);
                     groups.sort(() => Math.random() - 0.5);
-
                     const pickedSingles = singles.slice(0, 90);
                     const pickedGroups = groups.slice(0, 5);
                     groupedQuestions = [...pickedSingles, ...pickedGroups].sort(() => Math.random() - 0.5);
@@ -558,15 +554,11 @@
                     }
                 }
 
-                if (selectedOrder === 'random') {
-                    pool.sort(() => Math.random() - 0.5);
-                } else {
-                    pool.sort((a, b) => {
-                        const numA = a.type === 'single' ? parseInt(a.num) : (parseInt(a.group) + 100);
-                        const numB = b.type === 'single' ? parseInt(b.num) : (parseInt(b.group) + 100);
-                        return numA - numB;
-                    });
-                }
+                pool.sort((a, b) => {
+                    const numA = a.type === 'single' ? parseInt(a.num) : (parseInt(a.group) + 100);
+                    const numB = b.type === 'single' ? parseInt(b.num) : (parseInt(b.group) + 100);
+                    return numA - numB;
+                });
                 groupedQuestions = pool;
             }
 
@@ -632,15 +624,11 @@
         return { singles, groups: Object.values(groupsMap) };
     }
 
-    /* 範囲ごとに中断データを保存 */
     function saveActiveProgress() {
-        const key = getActiveSaveKey();
-        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
-
-        activeSavesMap[key] = {
-            selectedSetIds: selectedSetIds,
+        const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
+        savesMap[getSaveKey()] = {
+            selectedRangeKey: selectedRangeKey,
             selectedMode: selectedMode,
-            selectedOrder: selectedOrder,
             currentIndex: currentIndex,
             normalScore: normalScore,
             totalMistakes: totalMistakes,
@@ -648,8 +636,7 @@
             sessionMistakeSteps: sessionMistakeSteps,
             stepResultsMap: stepResultsMap
         };
-
-        localStorage.setItem('driver_quiz_active_saves_map', JSON.stringify(activeSavesMap));
+        localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
     }
 
     function showQuestion() {
@@ -954,7 +941,6 @@
         }
     }
 
-    /* --- ジャンプ機能用ロジック --- */
     function openJumpModal() {
         const grid = document.getElementById('jump-grid');
         grid.innerHTML = "";
@@ -1025,29 +1011,16 @@
     }
 
     function finishQuiz() {
-        // 完答時はその範囲の中断データを削除
-        const key = getActiveSaveKey();
-        const activeSavesMap = JSON.parse(localStorage.getItem('driver_quiz_active_saves_map') || '{}');
-        delete activeSavesMap[key];
-        localStorage.setItem('driver_quiz_active_saves_map', JSON.stringify(activeSavesMap));
+        const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
+        delete savesMap[getSaveKey()];
+        localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
 
         if (selectedMode === 'all') {
-            if (selectedSetIds.length === 1) {
-                const setId = selectedSetIds[0];
-                const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
-                if (!historyMap[setId]) historyMap[setId] = [];
-                historyMap[setId].push(normalScore);
-                if (historyMap[setId].length > 10) historyMap[setId].shift();
-                localStorage.setItem('driver_quiz_history_map', JSON.stringify(historyMap));
-            } else {
-                const multiHistory = JSON.parse(localStorage.getItem('driver_quiz_multi_history') || '[]');
-                multiHistory.push({
-                    sets: selectedSetIds,
-                    score: normalScore
-                });
-                if (multiHistory.length > 10) multiHistory.shift();
-                localStorage.setItem('driver_quiz_multi_history', JSON.stringify(multiHistory));
-            }
+            const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
+            if (!historyMap[selectedRangeKey]) historyMap[selectedRangeKey] = [];
+            historyMap[selectedRangeKey].push(normalScore);
+            if (historyMap[selectedRangeKey].length > 10) historyMap[selectedRangeKey].shift();
+            localStorage.setItem('driver_quiz_history_map', JSON.stringify(historyMap));
         }
 
         document.getElementById('quiz-screen').classList.remove('active');
