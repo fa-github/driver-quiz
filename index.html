@@ -138,12 +138,12 @@
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
         .modal-content { background:white; padding:18px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
 
-        /* ジャンプ用グリッド */
+        /* ジャンプ用グリッド & 色分けスタイル */
         .jump-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 6px;
-            max-height: 52vh;
+            max-height: 48vh;
             overflow-y: auto;
             padding: 6px;
             margin-top: 10px;
@@ -152,21 +152,41 @@
             background-color: #f2f2f7;
             border: 1px solid #d1d1d6;
             border-radius: 8px;
-            padding: 8px 2px;
-            font-size: 0.78em;
+            padding: 6px 2px;
+            font-size: 0.76em;
             cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: relative;
+            min-height: 42px;
         }
         .jump-btn.current {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+            border: 2px solid var(--primary-color) !important;
             font-weight: bold;
+            box-shadow: 0 0 6px rgba(0, 122, 255, 0.4);
+        }
+        .jump-btn.state-correct {
+            background-color: #e8f8ed;
+            border-color: var(--success-color);
+            color: #1e7e34;
+        }
+        .jump-btn.state-incorrect {
+            background-color: #ffebe9;
+            border-color: var(--danger-color);
+            color: #c5221f;
+        }
+        .jump-btn.state-bm {
+            background-color: #fff9e6;
+            border-color: var(--warning-color);
+            color: #b36b00;
         }
         .jump-subtext {
             font-size: 0.85em;
-            opacity: 0.8;
-            margin-top: 2px;
+            opacity: 0.85;
+            margin-top: 1px;
+        }
+        .jump-legend {
+            display: flex; justify-content: space-around; font-size: 0.72em; color: var(--text-sub);
+            margin-top: 6px; padding: 4px; background: #f9f9f9; border-radius: 8px;
         }
     </style>
 </head>
@@ -265,10 +285,15 @@
 <!-- 問題ジャンプ用モーダル -->
 <div id="jump-modal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; margin-bottom:4px;">問題番号を選択</h3>
-        <p style="font-size:0.8em; color:var(--text-sub); margin:0;">移動したい問題番号をタップしてください</p>
+        <h3 style="margin-top:0; margin-bottom:2px;">問題番号を選択</h3>
+        <div class="jump-legend">
+            <span>🟢 正解</span>
+            <span>🔴 不正解</span>
+            <span>🟡 ★復習</span>
+            <span>⚪ 未解答</span>
+        </div>
         <div id="jump-grid" class="jump-grid"></div>
-        <button class="btn-secondary" style="margin-top:12px; padding:10px;" onclick="closeJumpModal()">閉じる</button>
+        <button class="btn-secondary" style="margin-top:10px; padding:10px;" onclick="closeJumpModal()">閉じる</button>
     </div>
 </div>
 
@@ -285,6 +310,9 @@
     let totalMistakes = 0;
     let groupUserAnswers = {};
     let sessionMistakeSteps = [];
+    
+    // ステータス管理用マップ（index ➔ 'correct' | 'incorrect'）
+    let stepResultsMap = {};
 
     const SETS_CONFIG = [
         { id: "1", name: "第 1 集" },
@@ -393,6 +421,7 @@
             normalScore = activeSave.normalScore;
             totalMistakes = activeSave.totalMistakes;
             sessionMistakeSteps = activeSave.sessionMistakeSteps || [];
+            stepResultsMap = activeSave.stepResultsMap || {};
 
             document.getElementById('q-total').innerText = groupedQuestions.length;
             showQuestion();
@@ -490,6 +519,7 @@
             normalScore = 0;
             totalMistakes = 0;
             sessionMistakeSteps = [];
+            stepResultsMap = {};
 
             document.getElementById('q-total').innerText = groupedQuestions.length;
             showQuestion();
@@ -556,7 +586,8 @@
             normalScore: normalScore,
             totalMistakes: totalMistakes,
             groupedQuestions: groupedQuestions,
-            sessionMistakeSteps: sessionMistakeSteps
+            sessionMistakeSteps: sessionMistakeSteps,
+            stepResultsMap: stepResultsMap
         };
         localStorage.setItem('driver_quiz_active_save', JSON.stringify(activeSave));
     }
@@ -580,7 +611,6 @@
         const rawImgStr = (currentStep.img || "").toString().trim();
 
         if (rawImgStr !== "") {
-            // 改行またはカンマで分割
             const imgUrls = rawImgStr.split(/[\r\n,]+/).map(s => s.trim()).filter(s => s !== "");
 
             if (imgUrls.length > 0) {
@@ -716,8 +746,10 @@
 
         if (isCorrect) {
             normalScore += 1;
+            stepResultsMap[currentIndex] = 'correct';
         } else {
             totalMistakes += 1;
+            stepResultsMap[currentIndex] = 'incorrect';
             recordMistake(step.uniqueKey);
             sessionMistakeSteps.push(step);
         }
@@ -752,7 +784,9 @@
 
         if (allCorrect) {
             normalScore += 2;
+            stepResultsMap[currentIndex] = 'correct';
         } else {
+            stepResultsMap[currentIndex] = 'incorrect';
             sessionMistakeSteps.push(step);
         }
 
@@ -778,23 +812,75 @@
 
     function nextQuestion() {
         document.getElementById('btn-confirm-group').style.display = 'block';
-        currentIndex++;
 
-        if (currentIndex < groupedQuestions.length) {
+        const totalAnsweredCount = Object.keys(stepResultsMap).length;
+        if (totalAnsweredCount >= groupedQuestions.length) {
+            finishQuiz();
+            return;
+        }
+
+        let nextIdx = -1;
+        for (let i = currentIndex + 1; i < groupedQuestions.length; i++) {
+            if (!stepResultsMap[i]) {
+                nextIdx = i;
+                break;
+            }
+        }
+        if (nextIdx === -1) {
+            for (let i = 0; i < currentIndex; i++) {
+                if (!stepResultsMap[i]) {
+                    nextIdx = i;
+                    break;
+                }
+            }
+        }
+
+        if (nextIdx !== -1) {
+            currentIndex = nextIdx;
             showQuestion();
         } else {
             finishQuiz();
         }
     }
 
-    /* --- ジャンプ機能用ロジック --- */
+    /* --- ジャンプ機能用ロジック（ステータス別色分け表示） --- */
     function openJumpModal() {
         const grid = document.getElementById('jump-grid');
         grid.innerHTML = "";
 
+        const bookmarkSet = new Set(JSON.parse(localStorage.getItem('driver_quiz_bookmarks') || '[]'));
+
         groupedQuestions.forEach((step, idx) => {
             const btn = document.createElement('div');
-            btn.className = "jump-btn" + (idx === currentIndex ? " current" : "");
+            const resultState = stepResultsMap[idx]; // 'correct' | 'incorrect' | undefined
+            const isCurrent = (idx === currentIndex);
+
+            let isBm = false;
+            if (step.type === 'single') {
+                isBm = bookmarkSet.has(step.uniqueKey);
+            } else {
+                isBm = step.items.some(item => bookmarkSet.has(item._uniqueKey));
+            }
+
+            let stateClass = "";
+            let iconMark = "";
+
+            if (resultState === 'correct') {
+                stateClass = " state-correct";
+                iconMark = "✓";
+            } else if (resultState === 'incorrect') {
+                stateClass = " state-incorrect";
+                iconMark = "✕";
+            } else if (isBm) {
+                stateClass = " state-bm";
+                iconMark = "★";
+            }
+
+            if (isCurrent) {
+                stateClass += " current";
+            }
+
+            btn.className = "jump-btn" + stateClass;
 
             let labelText = "";
             if (step.type === 'single') {
@@ -804,7 +890,7 @@
             }
 
             btn.innerHTML = `
-                <div><strong>#${idx + 1}</strong></div>
+                <div><strong>#${idx + 1}</strong> ${iconMark}</div>
                 <div class="jump-subtext">${labelText}</div>
             `;
 
@@ -868,6 +954,7 @@
         normalScore = 0;
         totalMistakes = 0;
         sessionMistakeSteps = [];
+        stepResultsMap = {};
 
         document.getElementById('result-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
