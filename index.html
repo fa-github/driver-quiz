@@ -29,155 +29,161 @@
             width: 92%; max-width: 500px;
             border-radius: 20px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            padding: 16px 20px 20px 20px; box-sizing: border-box;
+            padding: 14px 18px 16px 18px; box-sizing: border-box;
             display: flex; flex-direction: column;
-            min-height: 88vh;
+            min-height: 86vh;
         }
 
         .screen { display: none; flex-direction: column; height: 100%; flex-grow: 1; }
         .active { display: flex; }
 
         .title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
-        h1 { font-size: 1.35em; text-align: center; color: var(--text-main); margin: 0; flex-grow: 1; }
+        h1 { font-size: 1.3em; text-align: center; color: var(--text-main); margin: 0; flex-grow: 1; }
         .btn-reload { background: none; border: none; font-size: 1.1em; cursor: pointer; padding: 2px 6px; border-radius: 8px; background-color: #f2f2f7; }
 
-        h2 { font-size: 0.85em; color: var(--text-sub); text-align: center; margin-bottom: 12px; }
+        h2 { font-size: 0.82em; color: var(--text-sub); text-align: center; margin-bottom: 10px; }
 
-        .section-label { font-size: 0.88em; font-weight: bold; color: var(--text-main); margin: 10px 0 6px 0; display: flex; justify-content: space-between; align-items: center; }
+        .section-label { font-size: 0.85em; font-weight: bold; color: var(--text-main); margin: 8px 0 5px 0; display: flex; justify-content: space-between; align-items: center; }
 
-        .combo-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+        .combo-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
         .combo-card {
             background-color: #f9f9f9; border: 2px solid #e5e5ea; border-radius: 12px;
             padding: 6px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 54px; text-align: center; box-sizing: border-box; transition: all 0.2s;
+            min-height: 52px; text-align: center; box-sizing: border-box; transition: all 0.2s;
         }
         .combo-card.selected { border-color: var(--primary-color); background-color: #e5f1ff; }
-        .combo-title { font-size: 0.85em; font-weight: bold; color: var(--text-main); }
+        .combo-title { font-size: 0.82em; font-weight: bold; color: var(--text-main); }
 
-        .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
         .set-card {
             background-color: #f9f9f9; border: 2px solid #e5e5ea; border-radius: 12px;
-            padding: 8px 10px; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-start;
-            min-height: 60px; box-sizing: border-box; transition: all 0.2s;
+            padding: 6px 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-start;
+            min-height: 56px; box-sizing: border-box; transition: all 0.2s;
         }
         .set-card.selected { border-color: var(--primary-color); background-color: #e5f1ff; }
-        .set-title { font-size: 0.9em; font-weight: bold; color: var(--text-main); line-height: 1.2; }
-        .set-status { font-size: 0.72em; color: var(--text-sub); margin-top: 3px; font-weight: 500; line-height: 1.2; }
-        .set-resume-badge { font-size: 0.75em; color: var(--warning-color); font-weight: bold; margin-top: 2px; line-height: 1.2; }
+        .set-title { font-size: 0.88em; font-weight: bold; color: var(--text-main); line-height: 1.2; }
+        .set-status { font-size: 0.7em; color: var(--text-sub); margin-top: 2px; font-weight: 500; line-height: 1.2; }
+        .set-resume-badge { font-size: 0.72em; color: var(--warning-color); font-weight: bold; margin-top: 1px; line-height: 1.2; }
         .history-dots { color: var(--primary-color); font-weight: bold; }
 
-        .mode-group { display: flex; gap: 6px; margin-bottom: 12px; }
+        .mode-group { display: flex; gap: 6px; margin-bottom: 10px; }
         .mode-btn {
-            flex: 1; padding: 8px 4px; text-align: center;
+            flex: 1; padding: 7px 4px; text-align: center;
             border: 1px solid #d1d1d6; border-radius: 10px;
             cursor: pointer; font-weight: bold; background-color: #f9f9f9;
-            font-size: 0.8em; color: var(--text-main);
+            font-size: 0.78em; color: var(--text-main);
         }
         .mode-btn.selected { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
 
         .btn-primary, .btn-secondary, .btn-warning {
             background-color: var(--primary-color); color: white; border: none;
-            padding: 13px; font-size: 1.0em; font-weight: bold;
-            border-radius: 14px; cursor: pointer; width: 100%; margin-top: 4px;
+            padding: 12px; font-size: 0.95em; font-weight: bold;
+            border-radius: 14px; cursor: pointer; width: 100%; margin-top: 2px;
         }
         .btn-secondary { background-color: #8e8e93; }
         .btn-warning { background-color: var(--warning-color); }
 
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 4px; }
-        .btn-quit { background: none; border: none; color: var(--danger-color); font-size: 0.85em; font-weight: bold; cursor: pointer; padding: 0; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; }
+        .btn-quit { background: none; border: none; color: var(--danger-color); font-size: 0.82em; font-weight: bold; cursor: pointer; padding: 0; }
         .btn-bookmark, .btn-jump, .btn-edit {
             background: #f2f2f7; border: 1px solid #d1d1d6; border-radius: 20px;
-            padding: 4px 8px; font-size: 0.78em; font-weight: bold; cursor: pointer; color: var(--text-main);
+            padding: 3px 8px; font-size: 0.76em; font-weight: bold; cursor: pointer; color: var(--text-main);
         }
         .btn-bookmark.active { background: #fff9e6; border-color: var(--warning-color); color: var(--warning-color); }
 
-        .score-badge { background-color: #e5f1ff; color: var(--primary-color); padding: 3px 8px; border-radius: 10px; font-weight: bold; font-size: 0.82em; }
+        .score-badge { background-color: #e5f1ff; color: var(--primary-color); padding: 2px 7px; border-radius: 10px; font-weight: bold; font-size: 0.78em; }
 
         .quiz-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #e5e5ea; padding-bottom: 4px; margin-bottom: 12px;
-            font-size: 0.82em; color: var(--text-sub);
+            border-bottom: 1px solid #e5e5ea; padding-bottom: 4px; margin-bottom: 8px;
+            font-size: 0.8em; color: var(--text-sub);
         }
 
         .img-container {
-            width: 100%; text-align: center; margin-bottom: 12px;
-            display: flex; flex-direction: column; gap: 6px; align-items: center;
+            width: 100%; text-align: center; margin-bottom: 8px;
+            display: flex; flex-direction: column; gap: 4px; align-items: center;
         }
-        .img-container img { max-width: 100%; max-height: 150px; border-radius: 10px; border: 1px solid #e5e5ea; }
+        .img-container img { max-width: 100%; max-height: 130px; border-radius: 10px; border: 1px solid #e5e5ea; }
 
         #single-q-box { display: none; flex-direction: column; justify-content: flex-start; flex-grow: 1; }
+        
+        /* 通常時は余白40px、回答表示時は10pxに動的縮小してスクロール防止 */
         #question-text {
-            font-size: 1.05em; line-height: 1.5; color: var(--text-main);
+            font-size: 1.0em; line-height: 1.45; color: var(--text-main);
             margin-bottom: 40px;
             font-weight: 500;
+            transition: margin-bottom 0.2s ease;
+        }
+        #single-q-box.has-result #question-text {
+            margin-bottom: 10px !important;
         }
         
-        .btn-ans-group { display: flex; gap: 10px; margin-bottom: 12px; }
-        .btn-ans { flex: 1; padding: 14px 0; font-size: 2.0em; border: none; border-radius: 14px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-ans-group { display: flex; gap: 10px; margin-bottom: 8px; }
+        .btn-ans { flex: 1; padding: 12px 0; font-size: 1.8em; border: none; border-radius: 14px; cursor: pointer; color: white; font-weight: bold; }
         #btn-true { background-color: var(--success-color); }
         #btn-false { background-color: var(--danger-color); }
 
-        .group-sub-q { background: #f9f9f9; padding: 8px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e5e5ea; }
-        .group-sub-text { font-size: 0.88em; line-height: 1.35; font-weight: bold; margin-bottom: 4px; color: var(--text-main); }
-        .group-toggle-group { display: flex; gap: 8px; }
+        .group-sub-q { background: #f9f9f9; padding: 6px 8px; border-radius: 10px; margin-bottom: 6px; border: 1px solid #e5e5ea; }
+        .group-sub-text { font-size: 0.85em; line-height: 1.3; font-weight: bold; margin-bottom: 4px; color: var(--text-main); }
+        .group-toggle-group { display: flex; gap: 6px; }
         .toggle-opt {
-            flex: 1; padding: 6px 0; text-align: center; border: 1px solid #d1d1d6; border-radius: 8px;
-            font-weight: bold; font-size: 1.0em; cursor: pointer; background: white; color: var(--text-sub);
+            flex: 1; padding: 5px 0; text-align: center; border: 1px solid #d1d1d6; border-radius: 8px;
+            font-weight: bold; font-size: 0.95em; cursor: pointer; background: white; color: var(--text-sub);
         }
         .toggle-opt.selected-true { background-color: var(--success-color); color: white; border-color: var(--success-color); }
         .toggle-opt.selected-false { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
 
-        #result-box { display: none; text-align: center; border-top: 1px solid #e5e5ea; padding-top: 8px; margin-top: 4px; }
-        #judgment { font-size: 1.5em; font-weight: bold; margin-bottom: 4px; }
+        /* 結果表示領域のコンパクト化 */
+        #result-box { display: none; text-align: center; border-top: 1px solid #e5e5ea; padding-top: 6px; margin-top: 2px; }
+        #judgment { font-size: 1.25em; font-weight: bold; margin-bottom: 2px; }
         .correct-judg { color: var(--success-color); }
         .incorrect-judg { color: var(--danger-color); }
         .explanation-box {
-            font-size: 0.85em; line-height: 1.35; color: var(--text-main);
-            background-color: #f2f2f7; padding: 8px 10px; border-radius: 10px;
-            margin: 6px 0 10px 0; text-align: left;
+            font-size: 0.82em; line-height: 1.35; color: var(--text-main);
+            background-color: #f2f2f7; padding: 6px 8px; border-radius: 10px;
+            margin: 4px 0 6px 0; text-align: left;
         }
 
-        .nav-btn-group { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; }
-        .nav-btn-group button { flex: 1; margin-top: 0; padding: 12px; font-size: 0.9em; }
+        .nav-btn-group { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+        .nav-btn-group button { flex: 1; margin-top: 0; padding: 10px; font-size: 0.88em; }
 
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
         .modal-content { background:white; padding:16px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
 
-        /* 編集モーダル用の入力フォームスタイル */
-        .edit-label { text-align: left; font-size: 0.8em; font-weight: bold; color: var(--text-sub); margin-top: 8px; }
+        .edit-label { text-align: left; font-size: 0.78em; font-weight: bold; color: var(--text-sub); margin-top: 6px; }
         .edit-textarea, .edit-select {
-            width: 100%; border: 1px solid #d1d1d6; border-radius: 8px; padding: 8px;
-            font-size: 0.9em; box-sizing: border-box; margin-top: 2px; font-family: inherit;
+            width: 100%; border: 1px solid #d1d1d6; border-radius: 8px; padding: 6px;
+            font-size: 0.85em; box-sizing: border-box; margin-top: 2px; font-family: inherit;
         }
 
         .jump-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
+            gap: 5px;
             max-height: 48vh;
             overflow-y: auto;
-            padding: 6px;
-            margin-top: 8px;
+            padding: 4px;
+            margin-top: 6px;
         }
         .jump-btn {
             background-color: #f2f2f7;
             border: 1px solid #d1d1d6;
             border-radius: 8px;
-            padding: 6px 2px;
-            font-size: 0.76em;
+            padding: 5px 2px;
+            font-size: 0.74em;
             cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             position: relative;
-            min-height: 42px;
+            min-height: 40px;
             box-sizing: border-box;
         }
         .jump-btn.state-correct { background-color: #e8f8ed; border-color: var(--success-color); color: #1e7e34; }
         .jump-btn.state-incorrect { background-color: #ffebe9; border-color: var(--danger-color); color: #c5221f; }
         .jump-btn.state-bm { border: 2px solid var(--warning-color) !important; }
         .jump-btn.current { outline: 2px solid var(--primary-color); outline-offset: -1px; font-weight: bold; }
-        .jump-subtext { font-size: 0.82em; opacity: 0.85; margin-top: 1px; }
+        .jump-subtext { font-size: 0.8em; opacity: 0.85; margin-top: 1px; }
         .jump-legend {
-            display: flex; justify-content: space-around; font-size: 0.7em; color: var(--text-sub);
+            display: flex; justify-content: space-around; font-size: 0.68em; color: var(--text-sub);
             margin-top: 4px; padding: 4px; background: #f9f9f9; border-radius: 8px;
         }
     </style>
@@ -247,11 +253,11 @@
         </div>
 
         <div id="group-q-box" style="display:none; flex-direction:column; flex-grow:1;">
-            <div style="font-weight:bold; font-size:0.88em; color:var(--primary-color); margin-bottom:6px;">
+            <div style="font-weight:bold; font-size:0.85em; color:var(--primary-color); margin-bottom:4px;">
                 【イラスト問題】3つの記述すべての◯✕を選択してください（全正解で2点）
             </div>
             <div id="group-sub-list"></div>
-            <button id="btn-confirm-group" class="btn-primary" onclick="checkGroupAnswer()" disabled style="opacity:0.5;">回答を確定する</button>
+            <button id="btn-confirm-group" class="btn-primary" onclick="checkGroupAnswer()" disabled style="opacity:0.5; padding:10px;">回答を確定する</button>
         </div>
 
         <div id="result-box">
@@ -267,10 +273,10 @@
 
     <div id="result-screen" class="screen" style="text-align: center; justify-content: center;">
         <h1 id="final-status">結果発表</h1>
-        <div style="font-size: 2.8em; font-weight: bold; margin: 10px 0 2px 0;" id="final-score">0 点</div>
-        <p style="color:var(--text-sub); margin-bottom:15px; font-size:0.85em;" id="final-score-sub">（100点満点中）</p>
+        <div style="font-size: 2.5em; font-weight: bold; margin: 8px 0 2px 0;" id="final-score">0 点</div>
+        <p style="color:var(--text-sub); margin-bottom:12px; font-size:0.82em;" id="final-score-sub">（100点満点中）</p>
 
-        <div style="background:#f2f2f7; padding:12px; border-radius:12px; margin-bottom:15px; text-align:left; line-height:1.7; font-size:0.9em;">
+        <div style="background:#f2f2f7; padding:10px 12px; border-radius:12px; margin-bottom:12px; text-align:left; line-height:1.6; font-size:0.85em;">
             <div>・間違えた問題数: <strong id="final-mistakes" style="color:var(--danger-color);">0</strong> 問</div>
             <div>・判定: <strong id="pass-fail-text"></strong></div>
         </div>
@@ -280,7 +286,6 @@
     </div>
 </div>
 
-<!-- 中断再開モーダル -->
 <div id="resume-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0;">中断データがあります</h3>
@@ -290,7 +295,6 @@
     </div>
 </div>
 
-<!-- 問題ジャンプ用モーダル -->
 <div id="jump-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0; margin-bottom:2px;">問題番号を選択</h3>
@@ -301,18 +305,17 @@
             <span>⚪ 未解答</span>
         </div>
         <div id="jump-grid" class="jump-grid"></div>
-        <button class="btn-secondary" style="margin-top:10px; padding:10px;" onclick="closeJumpModal()">閉じる</button>
+        <button class="btn-secondary" style="margin-top:8px; padding:8px;" onclick="closeJumpModal()">閉じる</button>
     </div>
 </div>
 
-<!-- 💡 問題修正・反映用モーダル -->
 <div id="edit-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0; margin-bottom:4px;">スプレッドシートの修正</h3>
         <div style="font-size:0.75em; color:var(--text-sub);" id="edit-target-label">対象問題: -</div>
         
         <div class="edit-label">問題文 (q)</div>
-        <textarea id="edit-q" class="edit-textarea" rows="4"></textarea>
+        <textarea id="edit-q" class="edit-textarea" rows="3"></textarea>
 
         <div class="edit-label">正解 (a)</div>
         <select id="edit-a" class="edit-select">
@@ -321,11 +324,11 @@
         </select>
 
         <div class="edit-label">解説 (ex)</div>
-        <textarea id="edit-ex" class="edit-textarea" rows="3"></textarea>
+        <textarea id="edit-ex" class="edit-textarea" rows="2"></textarea>
 
-        <div style="display:flex; gap:8px; margin-top:14px;">
-            <button class="btn-secondary" style="margin-top:0; padding:10px;" onclick="closeEditModal()">キャンセル</button>
-            <button id="btn-save-edit" class="btn-primary" style="margin-top:0; padding:10px;" onclick="saveQuestionEdit()">シートに保存</button>
+        <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn-secondary" style="margin-top:0; padding:8px;" onclick="closeEditModal()">キャンセル</button>
+            <button id="btn-save-edit" class="btn-primary" style="margin-top:0; padding:8px;" onclick="saveQuestionEdit()">シートに保存</button>
         </div>
     </div>
 </div>
@@ -496,6 +499,8 @@
             totalMistakes = activeSave.totalMistakes;
             sessionMistakeSteps = activeSave.sessionMistakeSteps || [];
             stepResultsMap = activeSave.stepResultsMap || {};
+            // 💡 対策: 中断データから「解き直しセッションかどうか」のフラグも正しく復元
+            isRetrySession = activeSave.isRetrySession || false;
 
             document.getElementById('q-total').innerText = groupedQuestions.length;
             showQuestion();
@@ -652,6 +657,7 @@
         return { singles, groups: Object.values(groupsMap) };
     }
 
+    /* 💡 対策: isRetrySession も保存データに含める */
     function saveActiveProgress() {
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         savesMap[getSaveKey()] = {
@@ -662,7 +668,8 @@
             totalMistakes: totalMistakes,
             groupedQuestions: groupedQuestions,
             sessionMistakeSteps: sessionMistakeSteps,
-            stepResultsMap: stepResultsMap
+            stepResultsMap: stepResultsMap,
+            isRetrySession: isRetrySession
         };
         localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
     }
@@ -703,20 +710,25 @@
             imgBox.style.display = 'none';
         }
 
+        const singleBox = document.getElementById('single-q-box');
+
         if (currentStep.type === "single") {
-            document.getElementById('single-q-box').style.display = 'flex';
+            singleBox.style.display = 'flex';
             document.getElementById('group-q-box').style.display = 'none';
             document.getElementById('question-text').innerText = currentStep.q;
 
             if (prevResult) {
                 document.getElementById('answer-buttons').style.display = 'none';
+                singleBox.classList.add('has-result'); // 余白縮小クラス付与
                 showResultUI(prevResult.isCorrect, prevResult.explanationHTML);
             } else {
                 document.getElementById('answer-buttons').style.display = 'flex';
                 document.getElementById('result-box').style.display = 'none';
+                singleBox.classList.remove('has-result'); // 余白通常化
             }
         } else {
-            document.getElementById('single-q-box').style.display = 'none';
+            singleBox.style.display = 'none';
+            singleBox.classList.remove('has-result');
             document.getElementById('group-q-box').style.display = 'flex';
             renderGroupQuestions(currentStep, prevResult);
         }
@@ -845,6 +857,7 @@
         if (stepResultsMap[currentIndex]) return;
 
         document.getElementById('answer-buttons').style.display = 'none';
+        document.getElementById('single-q-box').classList.add('has-result'); // 余白縮小
 
         const step = groupedQuestions[currentIndex];
         const isCorrect = (userAns === step.a);
@@ -890,8 +903,8 @@
             }
 
             explanationHTML += `
-                <div style="margin-bottom:6px; border-bottom:1px solid #e5e5ea; padding-bottom:4px;">
-                    <strong>小問${idx+1}: 正解 [ ${item.a} ]</strong>（あなたの回答: ${userAns} ${isSubCorrect ? '正解' : '不正解'}）<br>
+                <div style="margin-bottom:4px; border-bottom:1px solid #e5e5ea; padding-bottom:3px;">
+                    <strong>小問${idx+1}: 正解 [ ${item.a} ]</strong>（回答: ${userAns} ${isSubCorrect ? '正解' : '不正解'}）<br>
                     ${item.ex || '（解説なし）'}
                 </div>
             `;
@@ -1038,7 +1051,6 @@
         document.getElementById('jump-modal').style.display = 'none';
     }
 
-    /* 💡 修正機能のモーダルを開く処理 */
     function openEditModal() {
         const currentStep = groupedQuestions[currentIndex];
         
@@ -1055,7 +1067,6 @@
             defaultA = currentStep.a;
             defaultEx = currentStep.ex || "";
         } else {
-            // イラストグループ問題の場合は1つ目の小問
             targetSetId = currentStep.setId;
             targetNum = currentStep.items[0].num;
             defaultQ = currentStep.items[0].q;
@@ -1075,7 +1086,6 @@
         document.getElementById('edit-modal').style.display = 'none';
     }
 
-    /* 💡 スプレッドシートへ上書き送信（POST）する処理 */
     async function saveQuestionEdit() {
         const currentStep = groupedQuestions[currentIndex];
         
@@ -1115,7 +1125,6 @@
             if (resData.status === "success") {
                 alert("スプレッドシートの書き換えに成功しました！");
 
-                // 画面上の保持データも即座に更新
                 if (currentStep.type === "single") {
                     currentStep.q = newQ;
                     currentStep.a = newA;
@@ -1127,7 +1136,7 @@
                 }
 
                 closeEditModal();
-                showQuestion(); // 画面再描画
+                showQuestion();
             } else {
                 alert("保存に失敗しました: " + (resData.message || "エラー"));
             }
@@ -1145,6 +1154,7 @@
         delete savesMap[getSaveKey()];
         localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
 
+        // 模擬試験モードかつ「解き直し中でない」場合のみ点数履歴に反映
         if (selectedMode === 'all' && !isRetrySession) {
             const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
             if (!historyMap[selectedRangeKey]) historyMap[selectedRangeKey] = [];
@@ -1201,7 +1211,7 @@
         totalMistakes = 0;
         sessionMistakeSteps = [];
         stepResultsMap = {};
-        isRetrySession = true;
+        isRetrySession = true; // 解き直しフラグを立てる
 
         document.getElementById('result-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
