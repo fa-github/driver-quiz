@@ -107,7 +107,6 @@
 
         #single-q-box { display: none; flex-direction: column; justify-content: flex-start; flex-grow: 1; }
         
-        /* 通常時は余白40px、回答表示時は10pxに動的縮小してスクロール防止 */
         #question-text {
             font-size: 1.0em; line-height: 1.45; color: var(--text-main);
             margin-bottom: 40px;
@@ -133,7 +132,6 @@
         .toggle-opt.selected-true { background-color: var(--success-color); color: white; border-color: var(--success-color); }
         .toggle-opt.selected-false { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
 
-        /* 結果表示領域のコンパクト化 */
         #result-box { display: none; text-align: center; border-top: 1px solid #e5e5ea; padding-top: 6px; margin-top: 2px; }
         #judgment { font-size: 1.25em; font-weight: bold; margin-bottom: 2px; }
         .correct-judg { color: var(--success-color); }
@@ -347,7 +345,7 @@
     let sessionMistakeSteps = [];
     let stepResultsMap = {};
 
-    let isRetrySession = false;
+    let isRetrySession = false; // 結果画面からの「間違えた問題だけの解き直し」フラグ
 
     const SETS_CONFIG = [
         { id: "1", name: "第 1 集" },
@@ -462,7 +460,7 @@
     }
 
     function startQuizFromSetup() {
-        isRetrySession = false;
+        isRetrySession = false; // 通常テスト開始時は解き直しフラグOFF
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         const activeSave = savesMap[getSaveKey()];
 
@@ -499,7 +497,7 @@
             totalMistakes = activeSave.totalMistakes;
             sessionMistakeSteps = activeSave.sessionMistakeSteps || [];
             stepResultsMap = activeSave.stepResultsMap || {};
-            // 💡 対策: 中断データから「解き直しセッションかどうか」のフラグも正しく復元
+            // 中断保存データから解き直しセッションかどうかを正確に復元
             isRetrySession = activeSave.isRetrySession || false;
 
             document.getElementById('q-total').innerText = groupedQuestions.length;
@@ -657,7 +655,6 @@
         return { singles, groups: Object.values(groupsMap) };
     }
 
-    /* 💡 対策: isRetrySession も保存データに含める */
     function saveActiveProgress() {
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         savesMap[getSaveKey()] = {
@@ -719,12 +716,12 @@
 
             if (prevResult) {
                 document.getElementById('answer-buttons').style.display = 'none';
-                singleBox.classList.add('has-result'); // 余白縮小クラス付与
+                singleBox.classList.add('has-result');
                 showResultUI(prevResult.isCorrect, prevResult.explanationHTML);
             } else {
                 document.getElementById('answer-buttons').style.display = 'flex';
                 document.getElementById('result-box').style.display = 'none';
-                singleBox.classList.remove('has-result'); // 余白通常化
+                singleBox.classList.remove('has-result');
             }
         } else {
             singleBox.style.display = 'none';
@@ -857,7 +854,7 @@
         if (stepResultsMap[currentIndex]) return;
 
         document.getElementById('answer-buttons').style.display = 'none';
-        document.getElementById('single-q-box').classList.add('has-result'); // 余白縮小
+        document.getElementById('single-q-box').classList.add('has-result');
 
         const step = groupedQuestions[currentIndex];
         const isCorrect = (userAns === step.a);
@@ -1154,7 +1151,7 @@
         delete savesMap[getSaveKey()];
         localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
 
-        // 模擬試験モードかつ「解き直し中でない」場合のみ点数履歴に反映
+        // 💡 修正: 模擬試験モード、かつ「解き直し中でない」場合は中断経由であっても点数履歴に正しく保存！
         if (selectedMode === 'all' && !isRetrySession) {
             const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
             if (!historyMap[selectedRangeKey]) historyMap[selectedRangeKey] = [];
@@ -1211,7 +1208,7 @@
         totalMistakes = 0;
         sessionMistakeSteps = [];
         stepResultsMap = {};
-        isRetrySession = true; // 解き直しフラグを立てる
+        isRetrySession = true; // 解き直し（復習）フラグをON
 
         document.getElementById('result-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
