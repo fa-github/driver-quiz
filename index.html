@@ -512,7 +512,6 @@
 
         try {
             const targetSetIds = getSelectedSetIds();
-            // 💡 1回のリクエストで複数セットをまとめて取得（通信負荷軽減＆エラー対策）
             const querySets = targetSetIds.map(id => `set${id}`).join(',');
             const response = await fetch(`${GAS_API_URL}?set=${querySets}`);
             const combinedRaw = await response.json();
@@ -533,11 +532,14 @@
                     const pickedGroups = groups.slice(0, 5);
                     groupedQuestions = [...pickedSingles, ...pickedGroups];
                 } else {
+                    // 単発問題・イラスト問題をそれぞれ個別にランダム化
                     singles.sort(() => Math.random() - 0.5);
                     groups.sort(() => Math.random() - 0.5);
                     const pickedSingles = singles.slice(0, 90);
                     const pickedGroups = groups.slice(0, 5);
-                    groupedQuestions = [...pickedSingles, ...pickedGroups].sort(() => Math.random() - 0.5);
+                    
+                    // 💡 修正点: 最後に全混ぜせず、1〜90問目に単発、91〜95問目にイラストを順番通り正しく結合！
+                    groupedQuestions = [...pickedSingles, ...pickedGroups];
                 }
             } else {
                 let pool = [...singles, ...groups];
