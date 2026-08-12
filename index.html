@@ -345,7 +345,7 @@
     let sessionMistakeSteps = [];
     let stepResultsMap = {};
 
-    let isRetrySession = false; // 結果画面からの「間違えた問題だけの解き直し」フラグ
+    let isRetrySession = false; // 解き直し（復習）モード判定フラグ
 
     const SETS_CONFIG = [
         { id: "1", name: "第 1 集" },
@@ -460,7 +460,7 @@
     }
 
     function startQuizFromSetup() {
-        isRetrySession = false; // 通常テスト開始時は解き直しフラグOFF
+        isRetrySession = false;
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         const activeSave = savesMap[getSaveKey()];
 
@@ -497,7 +497,6 @@
             totalMistakes = activeSave.totalMistakes;
             sessionMistakeSteps = activeSave.sessionMistakeSteps || [];
             stepResultsMap = activeSave.stepResultsMap || {};
-            // 中断保存データから解き直しセッションかどうかを正確に復元
             isRetrySession = activeSave.isRetrySession || false;
 
             document.getElementById('q-total').innerText = groupedQuestions.length;
@@ -655,7 +654,10 @@
         return { singles, groups: Object.values(groupsMap) };
     }
 
+    /* 💡 修正1: 解き直し（復習）中の場合、通常セットの中断データ（savesMap）へは上書き保存しない */
     function saveActiveProgress() {
+        if (isRetrySession) return; // 解き直し中は保存をスキップして本来の中断データを守る
+
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         savesMap[getSaveKey()] = {
             selectedRangeKey: selectedRangeKey,
@@ -1014,7 +1016,7 @@
                 stateClass += " state-bm";
             }
 
-            if (isCurrent) {
+            if (isSelected) {
                 stateClass += " current";
             }
 
@@ -1147,11 +1149,12 @@
     }
 
     function finishQuiz() {
-        const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
-        delete savesMap[getSaveKey()];
-        localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
+        if (!isRetrySession) {
+            const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
+            delete savesMap[getSaveKey()];
+            localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
+        }
 
-        // 💡 修正: 模擬試験モード、かつ「解き直し中でない」場合は中断経由であっても点数履歴に正しく保存！
         if (selectedMode === 'all' && !isRetrySession) {
             const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
             if (!historyMap[selectedRangeKey]) historyMap[selectedRangeKey] = [];
@@ -1163,8 +1166,13 @@
         document.getElementById('quiz-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
 
+        /* 💡 修正2: 解き直し時は獲得点数(normalScore)ではなく、実際に正解した「問題カード数」を算出 */
         if (isRetrySession) {
-            document.getElementById('final-score').innerText = `${normalScore} / ${groupedQuestions.length} 問正解`;
+            let correctStepCount = 0;
+            Object.values(stepResultsMap).forEach(res => {
+                if (res.isCorrect) correctStepCount++;
+            });
+            document.getElementById('final-score').innerText = `${correctStepCount} / ${groupedQuestions.length} 問正解`;
             document.getElementById('final-score-sub').innerText = "（間違えた問題の復習）";
         } else {
             document.getElementById('final-score').innerText = `${normalScore} 点`;
@@ -1208,7 +1216,7 @@
         totalMistakes = 0;
         sessionMistakeSteps = [];
         stepResultsMap = {};
-        isRetrySession = true; // 解き直し（復習）フラグをON
+        isRetrySession = true;
 
         document.getElementById('result-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
