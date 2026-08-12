@@ -83,11 +83,11 @@
         .btn-secondary { background-color: #8e8e93; }
         .btn-warning { background-color: var(--warning-color); }
 
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 4px; }
         .btn-quit { background: none; border: none; color: var(--danger-color); font-size: 0.85em; font-weight: bold; cursor: pointer; padding: 0; }
-        .btn-bookmark, .btn-jump {
+        .btn-bookmark, .btn-jump, .btn-edit {
             background: #f2f2f7; border: 1px solid #d1d1d6; border-radius: 20px;
-            padding: 4px 10px; font-size: 0.8em; font-weight: bold; cursor: pointer; color: var(--text-main);
+            padding: 4px 8px; font-size: 0.78em; font-weight: bold; cursor: pointer; color: var(--text-main);
         }
         .btn-bookmark.active { background: #fff9e6; border-color: var(--warning-color); color: var(--warning-color); }
 
@@ -142,6 +142,13 @@
 
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:99; }
         .modal-content { background:white; padding:16px; border-radius:16px; width:88%; max-width:400px; text-align:center; box-sizing: border-box; }
+
+        /* 編集モーダル用の入力フォームスタイル */
+        .edit-label { text-align: left; font-size: 0.8em; font-weight: bold; color: var(--text-sub); margin-top: 8px; }
+        .edit-textarea, .edit-select {
+            width: 100%; border: 1px solid #d1d1d6; border-radius: 8px; padding: 8px;
+            font-size: 0.9em; box-sizing: border-box; margin-top: 2px; font-family: inherit;
+        }
 
         .jump-grid {
             display: grid;
@@ -218,7 +225,8 @@
     <div id="quiz-screen" class="screen">
         <div class="top-nav">
             <button class="btn-quit" onclick="quitQuiz()">✕ 中断</button>
-            <button class="btn-jump" onclick="openJumpModal()">🔢 問題移動</button>
+            <button class="btn-jump" onclick="openJumpModal()">🔢 移動</button>
+            <button class="btn-edit" onclick="openEditModal()">✏️ 修正</button>
             <button id="bm-toggle-btn" class="btn-bookmark" onclick="toggleCurrentBookmark()">★ ブックマーク</button>
             <div class="score-badge">獲得点: <span id="current-score">0</span> / 100 点</div>
         </div>
@@ -272,6 +280,7 @@
     </div>
 </div>
 
+<!-- 中断再開モーダル -->
 <div id="resume-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0;">中断データがあります</h3>
@@ -281,6 +290,7 @@
     </div>
 </div>
 
+<!-- 問題ジャンプ用モーダル -->
 <div id="jump-modal" class="modal">
     <div class="modal-content">
         <h3 style="margin-top:0; margin-bottom:2px;">問題番号を選択</h3>
@@ -292,6 +302,31 @@
         </div>
         <div id="jump-grid" class="jump-grid"></div>
         <button class="btn-secondary" style="margin-top:10px; padding:10px;" onclick="closeJumpModal()">閉じる</button>
+    </div>
+</div>
+
+<!-- 💡 問題修正・反映用モーダル -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; margin-bottom:4px;">スプレッドシートの修正</h3>
+        <div style="font-size:0.75em; color:var(--text-sub);" id="edit-target-label">対象問題: -</div>
+        
+        <div class="edit-label">問題文 (q)</div>
+        <textarea id="edit-q" class="edit-textarea" rows="4"></textarea>
+
+        <div class="edit-label">正解 (a)</div>
+        <select id="edit-a" class="edit-select">
+            <option value="◯">◯（正しい）</option>
+            <option value="✕">✕（誤り）</option>
+        </select>
+
+        <div class="edit-label">解説 (ex)</div>
+        <textarea id="edit-ex" class="edit-textarea" rows="3"></textarea>
+
+        <div style="display:flex; gap:8px; margin-top:14px;">
+            <button class="btn-secondary" style="margin-top:0; padding:10px;" onclick="closeEditModal()">キャンセル</button>
+            <button id="btn-save-edit" class="btn-primary" style="margin-top:0; padding:10px;" onclick="saveQuestionEdit()">シートに保存</button>
+        </div>
     </div>
 </div>
 
@@ -309,7 +344,7 @@
     let sessionMistakeSteps = [];
     let stepResultsMap = {};
 
-    let isRetrySession = false; // 解き直しセッションかどうかの判定フラグ
+    let isRetrySession = false;
 
     const SETS_CONFIG = [
         { id: "1", name: "第 1 集" },
@@ -424,7 +459,7 @@
     }
 
     function startQuizFromSetup() {
-        isRetrySession = false; // 通常スタート時は解き直しフラグOFF
+        isRetrySession = false;
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         const activeSave = savesMap[getSaveKey()];
 
@@ -1003,12 +1038,113 @@
         document.getElementById('jump-modal').style.display = 'none';
     }
 
+    /* 💡 修正機能のモーダルを開く処理 */
+    function openEditModal() {
+        const currentStep = groupedQuestions[currentIndex];
+        
+        let targetSetId = "";
+        let targetNum = "";
+        let defaultQ = "";
+        let defaultA = "◯";
+        let defaultEx = "";
+
+        if (currentStep.type === "single") {
+            targetSetId = currentStep.setId;
+            targetNum = currentStep.num;
+            defaultQ = currentStep.q;
+            defaultA = currentStep.a;
+            defaultEx = currentStep.ex || "";
+        } else {
+            // イラストグループ問題の場合は1つ目の小問
+            targetSetId = currentStep.setId;
+            targetNum = currentStep.items[0].num;
+            defaultQ = currentStep.items[0].q;
+            defaultA = currentStep.items[0].a;
+            defaultEx = currentStep.items[0].ex || "";
+        }
+
+        document.getElementById('edit-target-label').innerText = `対象: 第${targetSetId}集 - 問${targetNum} (${currentStep.type === "single" ? '単発問題' : 'イラスト問題小問1'})`;
+        document.getElementById('edit-q').value = defaultQ;
+        document.getElementById('edit-a').value = defaultA;
+        document.getElementById('edit-ex').value = defaultEx;
+
+        document.getElementById('edit-modal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-modal').style.display = 'none';
+    }
+
+    /* 💡 スプレッドシートへ上書き送信（POST）する処理 */
+    async function saveQuestionEdit() {
+        const currentStep = groupedQuestions[currentIndex];
+        
+        let targetSetId = currentStep.setId;
+        let targetNum = currentStep.type === "single" ? currentStep.num : currentStep.items[0].num;
+
+        const newQ = document.getElementById('edit-q').value.trim();
+        const newA = document.getElementById('edit-a').value;
+        const newEx = document.getElementById('edit-ex').value.trim();
+
+        if (!newQ) {
+            alert("問題文を入力してください。");
+            return;
+        }
+
+        const saveBtn = document.getElementById('btn-save-edit');
+        saveBtn.innerText = "保存中...";
+        saveBtn.disabled = true;
+
+        try {
+            const payload = {
+                set: `set${targetSetId}`,
+                num: targetNum,
+                q: newQ,
+                a: newA,
+                ex: newEx
+            };
+
+            const response = await fetch(GAS_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(payload)
+            });
+
+            const resData = await response.json();
+
+            if (resData.status === "success") {
+                alert("スプレッドシートの書き換えに成功しました！");
+
+                // 画面上の保持データも即座に更新
+                if (currentStep.type === "single") {
+                    currentStep.q = newQ;
+                    currentStep.a = newA;
+                    currentStep.ex = newEx;
+                } else {
+                    currentStep.items[0].q = newQ;
+                    currentStep.items[0].a = newA;
+                    currentStep.items[0].ex = newEx;
+                }
+
+                closeEditModal();
+                showQuestion(); // 画面再描画
+            } else {
+                alert("保存に失敗しました: " + (resData.message || "エラー"));
+            }
+        } catch (err) {
+            alert("通信エラーが発生しました。");
+            console.error(err);
+        } finally {
+            saveBtn.innerText = "シートに保存";
+            saveBtn.disabled = false;
+        }
+    }
+
     function finishQuiz() {
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         delete savesMap[getSaveKey()];
         localStorage.setItem('driver_quiz_saves_map', JSON.stringify(savesMap));
 
-        // 💡 対策: 模擬試験モードかつ解き直しセッションでない時のみ履歴を保存する
         if (selectedMode === 'all' && !isRetrySession) {
             const historyMap = JSON.parse(localStorage.getItem('driver_quiz_history_map') || '{}');
             if (!historyMap[selectedRangeKey]) historyMap[selectedRangeKey] = [];
@@ -1020,7 +1156,6 @@
         document.getElementById('quiz-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
 
-        // 表示文言の制御（解き直し中なら「問数」で判定）
         if (isRetrySession) {
             document.getElementById('final-score').innerText = `${normalScore} / ${groupedQuestions.length} 問正解`;
             document.getElementById('final-score-sub').innerText = "（間違えた問題の復習）";
@@ -1066,7 +1201,7 @@
         totalMistakes = 0;
         sessionMistakeSteps = [];
         stepResultsMap = {};
-        isRetrySession = true; // 💡 解き直しフラグをONに設定
+        isRetrySession = true;
 
         document.getElementById('result-screen').classList.remove('active');
         document.getElementById('quiz-screen').classList.add('active');
