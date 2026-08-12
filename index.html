@@ -345,7 +345,7 @@
     let sessionMistakeSteps = [];
     let stepResultsMap = {};
 
-    let isRetrySession = false; // 解き直し（復習）モード判定フラグ
+    let isRetrySession = false;
 
     const SETS_CONFIG = [
         { id: "1", name: "第 1 集" },
@@ -512,24 +512,12 @@
 
         try {
             const targetSetIds = getSelectedSetIds();
-            const fetchPromises = targetSetIds.map(id => 
-                fetch(`${GAS_API_URL}?set=set${id}`).then(r => r.json()).catch(() => [])
-            );
-            const results = await Promise.all(fetchPromises);
+            // 💡 1回のリクエストで複数セットをまとめて取得（通信負荷軽減＆エラー対策）
+            const querySets = targetSetIds.map(id => `set${id}`).join(',');
+            const response = await fetch(`${GAS_API_URL}?set=${querySets}`);
+            const combinedRaw = await response.json();
 
-            let combinedRaw = [];
-            results.forEach((rawData, idx) => {
-                const setId = targetSetIds[idx];
-                if (Array.isArray(rawData)) {
-                    rawData.forEach(item => {
-                        item._setId = setId;
-                        item._uniqueKey = `${setId}-${item.num}`;
-                        combinedRaw.push(item);
-                    });
-                }
-            });
-
-            if (combinedRaw.length === 0) {
+            if (!Array.isArray(combinedRaw) || combinedRaw.length === 0) {
                 alert("指定した範囲のデータが取得できませんでした。");
                 backToTop();
                 return;
@@ -654,9 +642,8 @@
         return { singles, groups: Object.values(groupsMap) };
     }
 
-    /* 💡 修正1: 解き直し（復習）中の場合、通常セットの中断データ（savesMap）へは上書き保存しない */
     function saveActiveProgress() {
-        if (isRetrySession) return; // 解き直し中は保存をスキップして本来の中断データを守る
+        if (isRetrySession) return;
 
         const savesMap = JSON.parse(localStorage.getItem('driver_quiz_saves_map') || '{}');
         savesMap[getSaveKey()] = {
@@ -1016,7 +1003,7 @@
                 stateClass += " state-bm";
             }
 
-            if (isSelected) {
+            if (isCurrent) {
                 stateClass += " current";
             }
 
@@ -1166,7 +1153,6 @@
         document.getElementById('quiz-screen').classList.remove('active');
         document.getElementById('result-screen').classList.add('active');
 
-        /* 💡 修正2: 解き直し時は獲得点数(normalScore)ではなく、実際に正解した「問題カード数」を算出 */
         if (isRetrySession) {
             let correctStepCount = 0;
             Object.values(stepResultsMap).forEach(res => {
